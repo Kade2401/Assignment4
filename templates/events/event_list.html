@@ -1,0 +1,17 @@
+{% if messages %}
+        {% for message in messages %}
+            <div style="color:red;">{{ message }}</div>
+        {% endfor %}
+{% endif %}
+<h1>Events</h1>
+<a href="{% url 'create_event' %}">Create New Event</a>
+<ul>
+{% for event in events %}
+    <li>
+        <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
+        ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
+    </li>
+{% empty %}
+    <li>No events available.</li>
+{% endfor %}
+</ul>

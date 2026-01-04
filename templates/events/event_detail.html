@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ event.name }}</title>
+</head>
+<body>
+    {% if messages %}
+        {% for message in messages %}
+            <div style="padding:10px; margin:10px 0; border-radius:4px;
+                {% if message.tags == 'error' %}background:#ffebee;color:#c62828;
+                {% elif message.tags == 'success' %}background:#e8f5e9;color:#2e7d32;
+                {% elif message.tags == 'warning' %}background:#fff8e1;color:#ff8f00;
+                {% else %}background:#e3f2fd;color:#1565c0;
+                {% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <h2>{{ event.name }}</h2>
+    <p>Date: {{ event.date }}</p>
+    <p>Capacity: {{ event.capacity }} | Available: {{ event.available_spots }}</p>
+
+    <h3>Attendees ({{ event.attendees.count }})</h3>
+    <ul>
+        {% for attendee in attendees %}
+            <li>{{ attendee.name }}
+                <form method="post" action="{% url 'remove_attendee' attendee.id %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" onclick="return confirm('Remove {{ attendee.name }}?')">Remove</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>No attendees yet.</li>
+        {% endfor %}
+    </ul>
+    {% if is_full %}
+        <div style="background:#ffebee; color:#c62828; padding:10px; border-radius:4px; margin-bottom:15px;">
+            ❌ This event is full! No more attendees can be registered.
+        </div>
+    {% endif %}
+    {% if not is_full %}
+    <h3>Register New Attendee</h3>
+    <form method="post" action="{% url 'register_attendee' event.id %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Register</button>
+    </form>
+{% endif %}
+    <p>
+        <a href="{% url 'edit_event' event.id %}">Edit</a> |
+        <a href="{% url 'delete_event' event.id %}" style="color:red;">Delete</a> |
+        <a href="{% url 'event_list' %}">Back</a>
+    </p>
+    <p><a href="{% url 'edit_event' event.id %}">Edit Event</a> |
+       <a href="{% url 'event_list' %}">Back to Events</a></p>
+</body>
+</html>
+
