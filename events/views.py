@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from .models import Event, Attendee
 from .forms import EventForm, AttendeeForm
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+import json
 
 def event_list(request):
     events = Event.objects.all()
@@ -76,3 +79,25 @@ def remove_attendee(request, attendee_id):
     attendee.delete()
     messages.info(request, f"Attendee removed from {attendee.event.name}.")
     return redirect('event_detail', event_id=event_id)
+
+def api_event_list(request):
+    if request.method == 'GET':
+        events = Event.objects.all().values(
+            'id', 'name', 'date', 'capacity'
+        )
+        return JsonResponse(list(events), safe=False)
+
+
+@csrf_exempt
+def api_create_event(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        event = Event.objects.create(
+            name=data['name'],
+            date=data['date'],
+            capacity=data['capacity']
+        )
+        return JsonResponse({
+            'status': 'created',
+            'event_id': event.id
+        })
