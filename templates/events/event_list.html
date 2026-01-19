@@ -13,32 +13,39 @@
   <div class="particle"></div>
   <div class="particle"></div>
   
-  <div class="card fade-in-up">
-    {% if messages %}
-      {% for message in messages %}
-        <div class="message {{ message.tags }}">{{ message }}</div>
-      {% endfor %}
-    {% endif %}
+  <div class="container">
+    <div class="content-card fade-in-up">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
 
-    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-      <h1 class="gradient-text">Events</h1>
-      <a href="{% url 'create_event' %}" class="btn btn-primary btn-create">Create New Event</a>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h1 class="gradient-text">Events</h1>
+        <a href="{% url 'create_event' %}" class="btn btn-primary btn-create">Create New Event</a>
+      </div>
+
+      {% if events %}
+        <ul class="event-list">
+          {% for event in events %}
+            <li class="event-item fade-in-up">
+              <a href="{% url 'event_detail' event.id %}">
+                <strong>{{ event.name }}</strong>
+                <div class="event-meta">
+                  📅 {{ event.date }} | 👥 {{ event.attendees.count }}/{{ event.capacity }} attendees
+                </div>
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      {% else %}
+        <div class="text-center" style="padding: 40px; color: #666; background: rgba(255, 255, 255, 0.7); border-radius: var(--border-radius);">
+          <h3>No events available yet</h3>
+          <p style="margin-top: 10px;">Create your first event to get started!</p>
+        </div>
+      {% endif %}
     </div>
-
-    <ul>
-      {% for event in events %}
-        <li class="event-card fade-in-up">
-          <a href="{% url 'event_detail' event.id %}"><strong>{{ event.name }}</strong></a>
-          <div class="event-meta">
-            ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
-          </div>
-        </li>
-      {% empty %}
-        <li class="text-center" style="padding: 20px; color: var(--dark-text);">
-          No events available. Create your first event!
-        </li>
-      {% endfor %}
-    </ul>
   </div>
 </body>
 </html>

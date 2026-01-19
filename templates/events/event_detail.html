@@ -3,52 +3,109 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ event.name }}</title>
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-  {% if messages %}
-    {% for message in messages %}
-      <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+  <!-- Плавающие частицы для фона -->
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  
+  <div class="container">
+    <div class="content-card fade-in-up">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">
+            <i class="fas fa-exclamation-circle"></i> {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
 
-  <h2>{{ event.name }}</h2>
-  <p><strong>Date:</strong> {{ event.date }}</p>
-  <p><strong>Capacity:</strong> {{ event.capacity }} | <strong>Available:</strong> {{ event.available_spots }}</p>
+      <div style="display: flex; justify-content: space-between; align-items-start; margin-bottom: 24px; flex-wrap: wrap;">
+        <div>
+          <h1 class="gradient-text">{{ event.name }}</h1>
+          <p style="color: #64748b; font-size: 18px; margin-top: 4px;">
+            <i class="fas fa-calendar-day"></i> {{ event.date }}
+          </p>
+        </div>
+        <div style="text-align: right; margin-top: 10px;">
+          <div style="background: {% if is_full %}#fee2e2{% else %}#dcfce7{% endif %}; 
+                      color: {% if is_full %}#b91c1c{% else %}#166534{% endif %}; 
+                      padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-block;
+                      margin-top: 10px;">
+            <i class="fas {% if is_full %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
+            {% if is_full %}FULL{% else %}{{ event.available_spots }} spots left{% endif %}
+          </div>
+        </div>
+      </div>
 
-  {% if is_full %}
-    <div class="message error">⚠ This event is full! No more attendees can be registered.</div>
-  {% endif %}
+      <div style="display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap;">
+        <div style="flex: 1; min-width: 300px;">
+          <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-users"></i> Attendees ({{ event.attendees.count }}/{{ event.capacity }})
+          </h3>
+          
+          <div style="background: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 16px;">
+            {% for attendee in attendees %}
+              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee;">
+                <span>{{ attendee.name }}</span>
+                <form method="post" action="{% url 'remove_attendee' attendee.id %}" style="display:inline;">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-danger" style="padding: 4px 12px; font-size: 14px;" 
+                          onclick="return confirm('Remove {{ attendee.name }}?')">
+                    <i class="fas fa-user-minus"></i> Remove
+                  </button>
+                </form>
+              </div>
+            {% empty %}
+              <p style="text-align: center; color: #94a3b8; padding: 16px; margin: 0;">
+                No attendees registered yet
+              </p>
+            {% endfor %}
+          </div>
+        </div>
+        
+        <div style="flex: 1; min-width: 300px;">
+          {% if not is_full %}
+            <div class="content-card" style="background: #f0f9ff; border: 1px dashed var(--primary);">
+              <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-user-plus" style="color: var(--primary);"></i> Register New Attendee
+              </h3>
+              
+              <form method="post" action="{% url 'register_attendee' event.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="id_name">Attendee Name</label>
+                  {{ form.name }}
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                  <i class="fas fa-user-check"></i> Register Attendee
+                </button>
+              </form>
+            </div>
+          {% else %}
+            <div class="message warning" style="margin-top: 24px;">
+              <i class="fas fa-exclamation-triangle"></i> Event is full! No new registrations allowed.
+            </div>
+          {% endif %}
+        </div>
+      </div>
 
-  <h3>Attendees ({{ event.attendees.count }})</h3>
-  <ul>
-    {% for attendee in attendees %}
-      <li>
-        {{ attendee.name }}
-        <form method="post" action="{% url 'remove_attendee' attendee.id %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" class="btn btn-danger" onclick="return confirm('Remove {{ attendee.name }}?')">Remove</button>
-        </form>
-      </li>
-    {% empty %}
-      <li>No attendees yet.</li>
-    {% endfor %}
-  </ul>
-
-  {% if not is_full %}
-    <h3>Register New Attendee</h3>
-    <form method="post" action="{% url 'register_attendee' event.id %}">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn">Register</button>
-    </form>
-  {% endif %}
-
-  <p class="mt-2">
-    <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">Edit</a> |
-    <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">Delete</a> |
-    <a href="{% url 'event_list' %}" class="btn btn-outline">Back</a>
-  </p>
+      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">
+        <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">
+          <i class="fas fa-edit"></i> Edit Event
+        </a>
+        <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">
+          <i class="fas fa-trash-alt"></i> Delete Event
+        </a>
+        <a href="{% url 'event_list' %}" class="btn btn-outline">
+          <i class="fas fa-arrow-left"></i> Back to Events
+        </a>
+      </div>
+    </div>
+  </div>
 </body>
 </html>
