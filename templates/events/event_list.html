@@ -3,28 +3,40 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Events</title>
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-  {% if messages %}
-    {% for message in messages %}
-      <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+  <!-- Плавающие частицы для фона -->
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  
+  <div class="card fade-in-up">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
 
-  <h1>Events</h1>
-  <p><a href="{% url 'create_event' %}" class="btn">Create New Event</a></p>
+    <h1 class="gradient-text">Events</h1>
+    <p><a href="{% url 'create_event' %}" class="btn btn-primary">Create New Event</a></p>
 
-  <ul>
-    {% for event in events %}
-      <li class="event-card">
-        <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
-        ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
-      </li>
-    {% empty %}
-      <li>No events available.</li>
-    {% endfor %}
-  </ul>
+    <ul>
+      {% for event in events %}
+        <li class="event-card fade-in-up">
+          <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
+          <div class="event-meta">
+            ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
+          </div>
+        </li>
+      {% empty %}
+        <li class="text-center" style="padding: 20px; color: #666;">
+          No events available. Create your first event!
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
 </body>
 </html>
