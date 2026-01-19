@@ -12,4 +12,8 @@ class EventModelTest(TestCase):
         )
         self.assertEqual(event.name, "Test Event")
         self.assertEqual(event.capacity, 20)
-
+        event = Event.delete(
+            name="Test Event",
+        )
+        self.assertEqual(event.name, "Test Event")
+        self.assertEqual(event.capacity, 20)
