@@ -1,5 +1,3 @@
-/* styles.css */
-
 /* Цвета и переменные */
 :root {
   --primary: #ff2a6d;
@@ -133,6 +131,23 @@ body::after {
   position: relative;
   overflow: hidden;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-create {
+  background: linear-gradient(45deg, #ff2a6d, #e6005c) !important;
+  color: white !important;
+  box-shadow: 0 4px 20px rgba(255, 42, 109, 0.5) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-create:hover {
+  background: linear-gradient(45deg, #e6005c, #cc0052) !important;
+  transform: translateY(-3px) scale(1.03);
+  box-shadow: 0 8px 25px rgba(255, 42, 109, 0.7) !important;
+}
+
+.btn-create::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.5), transparent) !important;
 }
 
 .btn::before {

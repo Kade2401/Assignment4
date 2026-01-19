@@ -20,19 +20,21 @@
       {% endfor %}
     {% endif %}
 
-    <h1 class="gradient-text">Events</h1>
-    <p><a href="{% url 'create_event' %}" class="btn btn-primary">Create New Event</a></p>
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+      <h1 class="gradient-text">Events</h1>
+      <a href="{% url 'create_event' %}" class="btn btn-primary btn-create">Create New Event</a>
+    </div>
 
     <ul>
       {% for event in events %}
         <li class="event-card fade-in-up">
-          <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
+          <a href="{% url 'event_detail' event.id %}"><strong>{{ event.name }}</strong></a>
           <div class="event-meta">
             ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
           </div>
         </li>
       {% empty %}
-        <li class="text-center" style="padding: 20px; color: #666;">
+        <li class="text-center" style="padding: 20px; color: var(--dark-text);">
           No events available. Create your first event!
         </li>
       {% endfor %}

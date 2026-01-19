@@ -3,22 +3,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Create Event</title>
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-  {% if messages %}
-    {% for message in messages %}
-      <div class="message {{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  {% endif %}
+  <!-- Плавающие частицы для фона -->
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  
+  <div class="card fade-in-up">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="message {{ message.tags }}">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
 
-  <h2>Create New Event</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn">Create Event</button>
-  </form>
-  <p class="mt-2"><a href="{% url 'event_list' %}" class="btn btn-outline">Back to Events</a></p>
+    <h2 class="gradient-text">Create New Event</h2>
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="btn btn-primary btn-create">Create Event</button>
+    </form>
+    <p class="mt-2"><a href="{% url 'event_list' %}" class="btn btn-outline">Back to Events</a></p>
+  </div>
 </body>
 </html>
