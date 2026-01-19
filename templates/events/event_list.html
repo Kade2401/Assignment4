@@ -1,17 +1,30 @@
-{% if messages %}
-        {% for message in messages %}
-            <div style="color:red;">{{ message }}</div>
-        {% endfor %}
-{% endif %}
-<h1>Events</h1>
-<a href="{% url 'create_event' %}">Create New Event</a>
-<ul>
-{% for event in events %}
-    <li>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Events</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+
+  <h1>Events</h1>
+  <p><a href="{% url 'create_event' %}" class="btn">Create New Event</a></p>
+
+  <ul>
+    {% for event in events %}
+      <li class="event-card">
         <a href="{% url 'event_detail' event.id %}">{{ event.name }}</a>
         ({{ event.date }} | {{ event.attendees.count }}/{{ event.capacity }})
-    </li>
-{% empty %}
-    <li>No events available.</li>
-{% endfor %}
-</ul>
+      </li>
+    {% empty %}
+      <li>No events available.</li>
+    {% endfor %}
+  </ul>
+</body>
+</html>

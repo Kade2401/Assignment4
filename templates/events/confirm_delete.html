@@ -1,25 +1,26 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Confirm Delete</title>
+  <meta charset="UTF-8">
+  <title>Confirm Delete</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
-    {% if messages %}
-        {% for message in messages %}
-            <div style=" color:red;">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
 
-    <h2>Delete Event "{{ event.name }}"?</h2>
-    <p>This action cannot be undone. All attendees will be deleted too.</p>
+  <h2>Delete Event "{{ event.name }}"?</h2>
+  <p class="message warning">This action cannot be undone. All attendees will be deleted too.</p>
 
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" style="background:red;color:white;">Delete Event</button>
-    </form>
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Delete Event</button>
+  </form>
 
-    <!-- Отмена: возврат к деталям мероприятия -->
-    <a href="{% url 'event_detail' event.pk %}">← Cancel</a>
+  <p class="mt-2"><a href="{% url 'event_detail' event.pk %}" class="btn btn-outline">&lt; Cancel</a></p>
 </body>
 </html>

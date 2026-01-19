@@ -1,25 +1,24 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Edit {{ event.name }}</title>
+  <meta charset="UTF-8">
+  <title>Edit {{ event.name }}</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
 </head>
 <body>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="message {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
 
-    {% if messages %}
-        {% for message in messages %}
-            <div style="color:red;">{{ message }}</div>
-        {% endfor %}
-    {% endif %}
-
-    <h2>Edit Event: {{ event.name }}</h2>
-
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Update Event</button>
-    </form>
-
-    <p><a href="{% url 'event_detail' event.id %}">Cancel</a></p>
+  <h2>Edit Event: {{ event.name }}</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn">Update Event</button>
+  </form>
+  <p class="mt-2"><a href="{% url 'event_detail' event.id %}" class="btn btn-outline">Cancel</a></p>
 </body>
 </html>
