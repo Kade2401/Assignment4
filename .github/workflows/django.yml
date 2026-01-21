@@ -32,10 +32,12 @@ jobs:
       run: |
         python manage.py check
 
-    - name: Run migrations
+    - name: Check for missing migrations
       run: |
-        python manage.py makemigrations --check --dry-run
-        python manage.py migrate
+        python manage.py makemigrations --check --dry-run || (
+          echo "❌ Missing migrations detected" && exit 1
+        )
+    
 
     - name: Run tests
       run: |
