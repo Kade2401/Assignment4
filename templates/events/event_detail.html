@@ -13,6 +13,14 @@
   <div class="particle"></div>
   <div class="particle"></div>
   
+  <div class="profile-button-wrapper">
+    {% if user.is_authenticated %}
+        <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
+    {% else %}
+        <a href="{% url 'login' %}" class="profile-btn">Log in</a>
+    {% endif %}
+  </div>
+
   <div class="container">
     <div class="content-card fade-in-up">
       {% if messages %}

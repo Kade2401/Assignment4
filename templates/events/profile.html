@@ -25,17 +25,17 @@
 
                 <div class="delete_account">
 
-                <form action="{% url 'delete_account' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action is irreversible');">
-                    {% csrf_token %}
-                    <button type="submit" style="background-color: #ff4d4d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                  Delete account
-                    </button>
-                </form>
-
                     <form method="POST" action="{% url 'logout' %}">
                         {% csrf_token %}
                         <button type="submit" class="logout-button">
                             Log out
+                        </button>
+                    </form>
+
+                    <form action="{% url 'delete_account' %}" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action is irreversible');">
+                        {% csrf_token %}
+                        <button type="submit" class="delete-button">
+                            Delete account
                         </button>
                     </form>
 

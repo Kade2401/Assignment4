@@ -135,33 +135,37 @@ def api_delete_event(request, event_id):
 
 def register(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        password2 = request.POST['password2']
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
 
-        if password == password2:
-            if User.objects.filter(username=username).exists():
-                messages.error(request, 'Имя пользователя уже занято')
-            else:
-                user = User.objects.create_user(username=username, password=password)
-                user.save()
-                messages.success(request, 'Аккаунт создан! Можете войти.')
-                return redirect('login')
-        else:
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Этот логин уже занят')
+            return render(request, 'registration/register.html')
+
+        if password != password2:
             messages.error(request, 'Пароли не совпадают')
+            return render(request, 'registration/register.html')
+
+        User.objects.create_user(username=username, password=password)
+        messages.success(request, 'Аккаунт создан!')
+        return redirect('login') 
+        
     return render(request, 'registration/register.html')
 
 def user_login(request):
     if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        if user is not None:
+        u = request.POST.get('username')
+        p = request.POST.get('password')
+        user = authenticate(username=u, password=p)
+        
+        if user:
             login(request, user)
-            return redirect('profile')  # Страница профиля
+            return redirect('profile')
         else:
-            messages.error(request, 'Неверный логин или пароль')
-    return render(request, 'login.html')
+            messages.error(request, 'Invalid username or password')
+            return render(request, 'registration/login.html') 
+    return render(request, 'registration/login.html')
 
 def user_logout(request):
     logout(request)
@@ -171,10 +175,12 @@ def user_logout(request):
 def delete_account(request):
     if request.method == 'POST':
         user = request.user
-        user.delete() # Удаляет пользователя из таблицы auth_user
-        messages.success(request, 'Ваш аккаунт был успешно удален.')
-        return redirect('register') # Перенаправляем на регистрацию
-    return redirect('profile') # Если зашли не через POST, возвращаем в профиль
+        logout(request)
+        user.delete() 
+        
+        messages.success(request, 'Account deleted')
+        return redirect('register')
+    return redirect('profile')
 
 @login_required
 def profile(request):

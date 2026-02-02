@@ -237,13 +237,13 @@ body::after {
   font-weight: 500;
 }
 
-.delete-account {
+.delete_account {
   display: flex;
   gap: 10px;
   margin-top: 15px;
 }
 
-.delete-account button {
+.delete_account button {
   padding: 12px 24px;
   font-size: 15px;
   border: none;
@@ -251,34 +251,42 @@ body::after {
   cursor: pointer;
   transition: var(--transition);
   font-weight: 600;
-  box-shadow: 0 4px 15px rgba(5, 217, 232, 0.4);
 }
 
-.delete-account button:hover {
+.delete_account button:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 25px rgba(5, 217, 232, 0.6);
+  box-shadow: 0 8px 25px rgba(254, 68, 80, 0.6);
 }
 
-.delete-account button:first-child {
-  background: linear-gradient(45deg, var(--secondary), #00c9d9);
-  color: white;
-}
-
-.delete-account button:first-child:hover {
-  background: linear-gradient(45deg, #00c9d9, #00b8c9);
-}
-
-.delete-account .logout-button {
+.delete_account .delete-button {
   background: linear-gradient(45deg, var(--danger), #fe6b70);
   color: white;
   box-shadow: 0 4px 15px rgba(254, 68, 80, 0.4);
 }
 
-.delete-account .logout-button:hover {
+.delete_account .delete-button:hover {
   background: linear-gradient(45deg, #fe6b70, var(--danger));
   box-shadow: 0 8px 25px rgba(254, 68, 80, 0.6);
 }
 
+.delete_account .logout-button {
+  background: linear-gradient(45deg, var(--secondary), #70f2ff);
+  color: var(--dark-text);
+  box-shadow: 0 4px 15px rgba(5, 217, 232, 0.4);
+  text-decoration: none;
+  display: inline-block;
+  padding: 12px 24px;
+  border-radius: var(--border-radius);
+  font-weight: 600;
+  transition: var(--transition);
+}
+
+.delete_account .logout-button:hover {
+  background: linear-gradient(45deg, #70f2ff, var(--secondary));
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(5, 217, 232, 0.6);
+  color: var(--dark-text);
+}
 
 .events {
   margin-top: 30px;
@@ -388,7 +396,7 @@ body::after {
     font-size: 14px;
   }
 
-  .delete-account button {
+  .delete_account button {
     width: 100%;
     padding: 10px;
   }
@@ -440,6 +448,6 @@ body::after {
     margin-right: 8px;
 }
 
-.delete-account form {
+.delete_account form {
     margin: 0;
 }
