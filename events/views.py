@@ -5,11 +5,16 @@ from .forms import EventForm, AttendeeForm
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
+from django.contrib.auth import login
+from .forms import RegisterForm
+from django.contrib.auth.decorators import login_required
+
 
 def event_list(request):
     events = Event.objects.all()
     return render(request, 'events/event_list.html', {'events': events})
 
+@login_required
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
@@ -30,6 +35,8 @@ def event_detail(request, event_id):
         'is_full': event.is_full()
     })
 
+
+@login_required
 def create_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
@@ -41,6 +48,7 @@ def create_event(request):
         form = EventForm()
     return render(request, 'events/create_event.html', {'form': form})
 
+@login_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
@@ -57,6 +65,7 @@ def edit_event(request, event_id):
         form = EventForm(instance=event)
     return render(request, 'events/edit_event.html', {'form': form, 'event': event})
 
+@login_required
 def register_attendee(request, event_id):
     event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
@@ -70,9 +79,9 @@ def register_attendee(request, event_id):
             else:
                 Attendee.objects.create(name=name, event=event)
                 messages.info(request, f"{name} successfully registered!")
-        return redirect('event_detail', event_id=event.id)
     return redirect('event_detail', event_id=event.id)
 
+@login_required
 def remove_attendee(request, attendee_id):
     attendee = get_object_or_404(Attendee, id=attendee_id)
     event_id = attendee.event.id
@@ -101,3 +110,34 @@ def api_create_event(request):
             'status': 'created',
             'event_id': event.id
         })
+
+def api_update_event(request, event_id):
+    if request.method == "PUT":
+        body = json.loads(request.body)
+        event = get_object_or_404(Event, id=event_id)
+
+        event.name = body.get("name", event.name)
+        event.date = body.get("date", event.date)
+        event.capacity = body.get("capacity", event.capacity)
+
+        event.save()
+        return JsonResponse({"status": "updated"})
+
+def api_delete_event(request, event_id):
+    if request.method == "DELETE":
+        event = get_object_or_404(Event, id=event_id)
+        event.delete()
+        return JsonResponse({"status": "deleted"})
+
+
+
+def register(request):
+    if request.method == "POST":
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect("event_list")
+    else:
+        form = RegisterForm()
+    return render(request, "registration/register.html", {"form": form})
