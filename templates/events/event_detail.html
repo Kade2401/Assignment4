@@ -57,21 +57,17 @@
           
           <div style="background: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 16px;">
             {% for attendee in attendees %}
-              <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee;">
-                <span>{{ attendee.name }}</span>
-                <form method="post" action="{% url 'remove_attendee' attendee.id %}" style="display:inline;">
-                  {% csrf_token %}
-                  <button type="submit" class="btn btn-danger" style="padding: 4px 12px; font-size: 14px;" 
-                          onclick="return confirm('Remove {{ attendee.name }}?')">
-                    <i class="fas fa-user-minus"></i> Remove
-                  </button>
-                </form>
-              </div>
-            {% empty %}
-              <p style="text-align: center; color: #94a3b8; padding: 16px; margin: 0;">
-                No attendees registered yet
-              </p>
-            {% endfor %}
+  <div style="display: flex; justify-content: space-between;">
+    <span>{{ attendee.name }}</span>
+
+    <form method="post"
+          action="{% url 'remove_attendee' event.id attendee.id %}">
+      {% csrf_token %}
+      <button type="submit">❌</button>
+    </form>
+  </div>
+{% endfor %}
+
           </div>
         </div>
         
@@ -83,15 +79,16 @@
               </h3>
               
               <form method="post" action="{% url 'register_attendee' event.id %}">
-                {% csrf_token %}
-                <div class="form-group">
-                  <label for="id_name">Attendee Name</label>
-                  {{ form.name }}
-                </div>
-                <button type="submit" class="btn btn-primary" style="width: 100%;">
-                  <i class="fas fa-user-check"></i> Register Attendee
-                </button>
-              </form>
+  {% csrf_token %}
+  <div class="form-group">
+    <label for="id_name">Attendee Name</label>
+    {{ form.name }}
+  </div>
+  <button type="submit" class="btn btn-primary">
+    Register Attendee
+  </button>
+</form>
+
             </div>
           {% else %}
             <div class="message warning" style="margin-top: 24px;">

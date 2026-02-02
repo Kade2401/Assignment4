@@ -29,10 +29,24 @@ def delete_event(request, event_id):
     return render(request, 'events/confirm_delete.html', {'event': event})
 
 @login_required
+@login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id, owner=request.user)
+    attendees = event.attendees.all()
+    is_full = attendees.count() >= event.capacity
+
     form = AttendeeForm()
-    return render(request, 'events/event_detail.html', {'form': form})
+
+    return render(
+        request,
+        'events/event_detail.html',
+        {
+            'event': event,
+            'attendees': attendees,
+            'is_full': is_full,
+            'form': form,
+        }
+    )
 
 
 @login_required
@@ -83,12 +97,15 @@ def register_attendee(request, event_id):
     return redirect('event_detail', event_id=event.id)
 
 @login_required
-def remove_attendee(request, attendee_id):
-    attendee = get_object_or_404(Attendee, id=attendee_id)
-    event_id = attendee.event.id
-    attendee.delete()
-    messages.info(request, f"Attendee removed from {attendee.event.name}.")
-    return redirect('event_detail', event_id=event_id)
+def remove_attendee(request, event_id, attendee_id):
+    event = get_object_or_404(Event, id=event_id, owner=request.user)
+    attendee = get_object_or_404(Attendee, id=attendee_id, event=event)
+
+    if request.method == "POST":
+        attendee.delete()
+        messages.success(request, "Attendee removed")
+
+    return redirect("event_detail", event_id=event.id)
 
 def api_event_list(request):
     if request.method == 'GET':
