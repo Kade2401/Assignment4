@@ -237,13 +237,13 @@ body::after {
   font-weight: 500;
 }
 
-.reset-password {
+.delete-account {
   display: flex;
   gap: 10px;
   margin-top: 15px;
 }
 
-.reset-password button {
+.delete-account button {
   padding: 12px 24px;
   font-size: 15px;
   border: none;
@@ -254,27 +254,27 @@ body::after {
   box-shadow: 0 4px 15px rgba(5, 217, 232, 0.4);
 }
 
-.reset-password button:hover {
+.delete-account button:hover {
   transform: translateY(-3px);
   box-shadow: 0 8px 25px rgba(5, 217, 232, 0.6);
 }
 
-.reset-password button:first-child {
+.delete-account button:first-child {
   background: linear-gradient(45deg, var(--secondary), #00c9d9);
   color: white;
 }
 
-.reset-password button:first-child:hover {
+.delete-account button:first-child:hover {
   background: linear-gradient(45deg, #00c9d9, #00b8c9);
 }
 
-.reset-password .logout-button {
+.delete-account .logout-button {
   background: linear-gradient(45deg, var(--danger), #fe6b70);
   color: white;
   box-shadow: 0 4px 15px rgba(254, 68, 80, 0.4);
 }
 
-.reset-password .logout-button:hover {
+.delete-account .logout-button:hover {
   background: linear-gradient(45deg, #fe6b70, var(--danger));
   box-shadow: 0 8px 25px rgba(254, 68, 80, 0.6);
 }
@@ -388,7 +388,7 @@ body::after {
     font-size: 14px;
   }
 
-  .reset-password button {
+  .delete-account button {
     width: 100%;
     padding: 10px;
   }
@@ -440,6 +440,6 @@ body::after {
     margin-right: 8px;
 }
 
-.reset-password form {
+.delete-account form {
     margin: 0;
 }
