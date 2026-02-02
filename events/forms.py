@@ -7,6 +7,7 @@ from django.contrib.auth.models import User
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
+        exclude = ['owner']
         fields = ['name', 'date', 'capacity']
         widgets = {
             'date': forms.DateInput(attrs={'type': 'date'}),

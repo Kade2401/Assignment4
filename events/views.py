@@ -14,10 +14,10 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect
 
 
+@login_required
 def event_list(request):
-    events = Event.objects.all()
+    events = Event.objects.filter(owner=request.user)
     return render(request, 'events/event_list.html', {'events': events})
-
 @login_required
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -28,30 +28,27 @@ def delete_event(request, event_id):
         return redirect('event_list')
     return render(request, 'events/confirm_delete.html', {'event': event})
 
+@login_required
 def event_detail(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    attendees = event.attendees.all()
+    event = get_object_or_404(Event, id=event_id, owner=request.user)
     form = AttendeeForm()
-    return render(request, 'events/event_detail.html', {
-        'event': event,
-        'attendees': attendees,
-        'form': form,
-        'is_full': event.is_full()
-    })
+    return render(request, 'events/event_detail.html', {'form': form})
 
 
+@login_required
 @login_required
 def create_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, "Event created successfully!")
+            event = form.save(commit=False)
+            event.owner = request.user
+            event.save()
             return redirect('event_list')
     else:
         form = EventForm()
-    return render(request, 'events/create_event.html', {'form': form})
 
+    return render(request, 'events/create_event.html', {'form': form})
 @login_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -140,15 +137,15 @@ def register(request):
         password2 = request.POST.get('password2')
 
         if User.objects.filter(username=username).exists():
-            messages.error(request, 'Этот логин уже занят')
+            messages.error(request, 'Login taken')
             return render(request, 'registration/register.html')
 
         if password != password2:
-            messages.error(request, 'Пароли не совпадают')
+            messages.error(request, 'Passwords do not match')
             return render(request, 'registration/register.html')
 
         User.objects.create_user(username=username, password=password)
-        messages.success(request, 'Аккаунт создан!')
+        messages.success(request, 'Account created!')
         return redirect('login') 
         
     return render(request, 'registration/register.html')

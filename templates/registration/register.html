@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Плавающие частицы для фона -->
     <div class="particle"></div>
     <div class="particle"></div>
     <div class="particle"></div>
@@ -18,8 +17,8 @@
         <div class="register-card">
             <div class="register-header">
                 <i class="fas fa-user-plus register-icon"></i>
-                <h2 class="register-title">Создайте аккаунт</h2>
-                <p class="register-subtitle">Зарегистрируйтесь, чтобы управлять событиями</p>
+                <h2 class="register-title">Create account</h2>
+                <p class="register-subtitle">Register</p>
             </div>
             
             <form method="POST" class="register-form">
@@ -27,27 +26,27 @@
                 
                 <div class="form-group">
                     <label for="username">
-                        <i class="fas fa-user"></i> Имя пользователя
+                        <i class="fas fa-user"></i> Username
                     </label>
                     <input 
                         type="text" 
                         name="username" 
                         id="username" 
-                        placeholder="Введите уникальное имя" 
+                        placeholder="Write unique name"
                         required
                     >
                 </div>
                 
                 <div class="form-group">
                     <label for="password">
-                        <i class="fas fa-lock"></i> Пароль
+                        <i class="fas fa-lock"></i> Password
                     </label>
                     <div class="password-wrapper">
                         <input 
                             type="password" 
                             name="password" 
                             id="password" 
-                            placeholder="Создайте надежный пароль" 
+                            placeholder="Create password"
                             required
                         >
                         <button type="button" class="toggle-password" onclick="togglePassword('password')">
@@ -58,14 +57,14 @@
                 
                 <div class="form-group">
                     <label for="password2">
-                        <i class="fas fa-lock"></i> Подтверждение пароля
+                        <i class="fas fa-lock"></i> Confirm password
                     </label>
                     <div class="password-wrapper">
                         <input 
                             type="password" 
                             name="password2" 
                             id="password2" 
-                            placeholder="Повторите пароль" 
+                            placeholder="Repeat password"
                             required
                         >
                         <button type="button" class="toggle-password" onclick="togglePassword('password2')">
@@ -75,12 +74,12 @@
                 </div>
                 
                 <button type="submit" class="register-btn">
-                    <i class="fas fa-user-check"></i> Зарегистрироваться
+                    <i class="fas fa-user-check"></i> Register
                 </button>
             </form>
             
             <div class="register-footer">
-                <p>Уже есть аккаунт? <a href="{% url 'login' %}" class="login-link">Войти</a></p>
+                <p>Already have an account? <a href="{% url 'login' %}" class="login-link">Log in</a></p>
             </div>
             
             {% if messages %}
