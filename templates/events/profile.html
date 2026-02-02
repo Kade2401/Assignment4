@@ -1,0 +1,42 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Профиль пользователя</title>
+    <link rel="stylesheet" href="{% static 'css/profile.css' %}">
+</head>
+<body>
+    <div class="content-card profile-card">
+        <div class="profile-header">
+            <img src="avatar.jpg" alt="Аватар" class="avatar">
+            <div class="profile-info">
+                <h2 class="nickname">Никнейм</h2>
+                <p class="creation-date">Дата создания: 01.01.2024</p>
+                <div class="reset-password">
+                    <button>Сбросить пароль</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="events">
+            <h3>Ивенты</h3>
+            <ul class="event-list">
+                <li class="event-item">
+                    <a href="#">Event 1</a>
+                    <div class="event-meta">10.02.2026</div>
+                </li>
+                <li class="event-item">
+                    <a href="#">Event 2</a>
+                    <div class="event-meta">15.03.2026</div>
+                </li>
+                <li class="event-item">
+                    <a href="#">Event 3</a>
+                    <div class="event-meta">20.04.2026</div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

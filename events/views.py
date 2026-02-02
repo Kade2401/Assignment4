@@ -129,8 +129,6 @@ def api_delete_event(request, event_id):
         event.delete()
         return JsonResponse({"status": "deleted"})
 
-
-
 def register(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
@@ -141,3 +139,13 @@ def register(request):
     else:
         form = RegisterForm()
     return render(request, "registration/register.html", {"form": form})
+
+@login_required
+def profile(request):
+    user = request.user
+    events = []
+    context = {
+        'user': user,
+        'events': events
+    }
+    return render(request, 'events/profile.html', context)
