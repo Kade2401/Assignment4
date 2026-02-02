@@ -12,7 +12,7 @@ from django.contrib.auth.decorators import login_required
 
 def event_list(request):
     events = Event.objects.all()
-    return render(request, 'events/event_list.html', {'events': events})
+    return render(request, 'registration/register.html', {'events': events})
 
 @login_required
 def delete_event(request, event_id):
