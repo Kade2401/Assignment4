@@ -12,7 +12,7 @@
 
         <div class="back-to-menu">
             <a href="{% url 'event_list' %}" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Вернуться в главное меню
+                <i class="fas fa-arrow-left"></i> Back to main menu
             </a>
         </div>
 
@@ -20,8 +20,8 @@
             <img src="avatar.jpg" class="avatar">
 
             <div class="profile-info">
-                <h2 class="nickname">Nickname</h2>
-                <p class="creation-date">Creation date: 01.01.2024</p>
+                <h2 class="nickname">{{ user.username }}</h2>
+                <p class="creation-date">Creation date: {{ user.date_joined|date:"d.m.Y" }}</p>
 
                 <div class="reset-password">
 

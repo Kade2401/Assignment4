@@ -1,13 +1,115 @@
-<h2>Register</h2>
-<form method="POST">
-    {% csrf_token %}
-    <input type="text" name="username" placeholder="Username" required><br>
-    <input type="email" name="email" placeholder="Email" required><br>
-    <input type="password" name="password" placeholder="Password" required><br>
-    <input type="password" name="password2" placeholder="Confirm Password" required><br>
-    <button type="submit">Register</button>
-</form>
-<a href="{% url 'login' %}">Login</a>
-{% for message in messages %}
-<p>{{ message }}</p>
-{% endfor %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="{% static 'css/register.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Плавающие частицы для фона -->
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    
+    <div class="register-container">
+        <div class="register-card">
+            <div class="register-header">
+                <i class="fas fa-user-plus register-icon"></i>
+                <h2 class="register-title">Создайте аккаунт</h2>
+                <p class="register-subtitle">Зарегистрируйтесь, чтобы управлять событиями</p>
+            </div>
+            
+            <form method="POST" class="register-form">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="username">
+                        <i class="fas fa-user"></i> Имя пользователя
+                    </label>
+                    <input 
+                        type="text" 
+                        name="username" 
+                        id="username" 
+                        placeholder="Введите уникальное имя" 
+                        required
+                    >
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> Пароль
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password" 
+                            id="password" 
+                            placeholder="Создайте надежный пароль" 
+                            required
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <i class="fas fa-eye" id="eye-icon-password"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password2">
+                        <i class="fas fa-lock"></i> Подтверждение пароля
+                    </label>
+                    <div class="password-wrapper">
+                        <input 
+                            type="password" 
+                            name="password2" 
+                            id="password2" 
+                            placeholder="Повторите пароль" 
+                            required
+                        >
+                        <button type="button" class="toggle-password" onclick="togglePassword('password2')">
+                            <i class="fas fa-eye" id="eye-icon-password2"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="register-btn">
+                    <i class="fas fa-user-check"></i> Зарегистрироваться
+                </button>
+            </form>
+            
+            <div class="register-footer">
+                <p>Уже есть аккаунт? <a href="{% url 'login' %}" class="login-link">Войти</a></p>
+            </div>
+            
+            {% if messages %}
+                <div class="messages-container">
+                    {% for message in messages %}
+                        <div class="message {{ message.tags }}">
+                            <i class="fas fa-exclamation-circle"></i> {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        function togglePassword(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const eyeIcon = document.getElementById(`eye-icon-${fieldId}`);
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.remove('fa-eye');
+                eyeIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('fa-eye-slash');
+                eyeIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
+</body>
+</html>

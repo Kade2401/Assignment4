@@ -10,6 +10,8 @@ from django.contrib.auth import login
 from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
+from django.contrib.auth import authenticate, login
+from django.shortcuts import redirect
 
 
 def event_list(request):
@@ -134,25 +136,20 @@ def api_delete_event(request, event_id):
 def register(request):
     if request.method == 'POST':
         username = request.POST['username']
-        email = request.POST['email']
         password = request.POST['password']
         password2 = request.POST['password2']
 
         if password == password2:
             if User.objects.filter(username=username).exists():
                 messages.error(request, 'Имя пользователя уже занято')
-            elif User.objects.filter(email=email).exists():
-                messages.error(request, 'Email уже используется')
             else:
-                user = User.objects.create_user(username=username, email=email, password=password)
+                user = User.objects.create_user(username=username, password=password)
                 user.save()
                 messages.success(request, 'Аккаунт создан! Можете войти.')
                 return redirect('login')
         else:
             messages.error(request, 'Пароли не совпадают')
-    return render(request, 'register.html')
-
-from django.contrib.auth import authenticate, login
+    return render(request, 'registration/register.html')
 
 def user_login(request):
     if request.method == 'POST':
@@ -169,6 +166,15 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def delete_account(request):
+    if request.method == 'POST':
+        user = request.user
+        user.delete() # Удаляет пользователя из таблицы auth_user
+        messages.success(request, 'Ваш аккаунт был успешно удален.')
+        return redirect('register') # Перенаправляем на регистрацию
+    return redirect('profile') # Если зашли не через POST, возвращаем в профиль
 
 @login_required
 def profile(request):
