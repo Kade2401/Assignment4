@@ -1,5 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
+from django.contrib.auth.models import User
 from .models import Event, Attendee
 from .forms import EventForm, AttendeeForm
 from django.http import JsonResponse
@@ -8,6 +9,7 @@ import json
 from django.contrib.auth import login
 from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 
 
 def event_list(request):
@@ -130,15 +132,43 @@ def api_delete_event(request, event_id):
         return JsonResponse({"status": "deleted"})
 
 def register(request):
-    if request.method == "POST":
-        form = RegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
+    if request.method == 'POST':
+        username = request.POST['username']
+        email = request.POST['email']
+        password = request.POST['password']
+        password2 = request.POST['password2']
+
+        if password == password2:
+            if User.objects.filter(username=username).exists():
+                messages.error(request, 'Имя пользователя уже занято')
+            elif User.objects.filter(email=email).exists():
+                messages.error(request, 'Email уже используется')
+            else:
+                user = User.objects.create_user(username=username, email=email, password=password)
+                user.save()
+                messages.success(request, 'Аккаунт создан! Можете войти.')
+                return redirect('login')
+        else:
+            messages.error(request, 'Пароли не совпадают')
+    return render(request, 'register.html')
+
+from django.contrib.auth import authenticate, login
+
+def user_login(request):
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
             login(request, user)
-            return redirect("event_list")
-    else:
-        form = RegisterForm()
-    return render(request, "registration/register.html", {"form": form})
+            return redirect('profile')  # Страница профиля
+        else:
+            messages.error(request, 'Неверный логин или пароль')
+    return render(request, 'login.html')
+
+def user_logout(request):
+    logout(request)
+    return redirect('login')
 
 @login_required
 def profile(request):

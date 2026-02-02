@@ -9,19 +9,33 @@
 </head>
 <body>
     <div class="content-card profile-card">
+
         <div class="back-to-menu">
             <a href="{% url 'event_list' %}" class="back-btn">
                 <i class="fas fa-arrow-left"></i> Вернуться в главное меню
             </a>
         </div>
+
         <div class="profile-header">
             <img src="avatar.jpg" class="avatar">
+
             <div class="profile-info">
                 <h2 class="nickname">Nickname</h2>
                 <p class="creation-date">Creation date: 01.01.2024</p>
+
                 <div class="reset-password">
-                    <button>Reset password</button>
-                    <button class="logout-button">Log out</button>
+
+                    <a href="">
+                        <button type="button">Reset password</button>
+                    </a>
+
+                    <form method="POST" action="{% url 'logout' %}">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-button">
+                            Log out
+                        </button>
+                    </form>
+
                 </div>
             </div>
         </div>
@@ -43,6 +57,7 @@
                 </li>
             </ul>
         </div>
+
     </div>
 </body>
 </html>
