@@ -1,95 +1,441 @@
 :root {
-    --light-bg: rgba(255, 255, 255, 0.8);
-    --dark-text: #222;
-    --primary: #007BFF;
-    --border-radius: 12px;
-    --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    --transition: 0.3s ease;
+  --primary: #ff2a6d;
+  --primary-light: #ff4d8d;
+  --secondary: #05d9e8;
+  --success: #05ffa1;
+  --danger: #fe4450;
+  --warning: #ffb400;
+  --light-bg: rgba(255, 255, 255, 0.85);
+  --dark-text: #1a1a2e;
+  --light-text: #ffffff;
+  --border-radius: 12px;
+  --box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  --transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.profile-card {
-    padding: 30px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.profile-header {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    margin-bottom: 30px;
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: var(--dark-text);
+  line-height: 1.6;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.avatar {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 2px solid rgba(0,0,0,0.1);
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background: linear-gradient(125deg, #ff2a6d, #ff4d8d, #c942ff, #4d44ff, #05d9e8, #05ffa1);
+  background-size: 400% 400%;
+  animation: gradientBG 15s ease infinite;
 }
 
-.profile-info h2.nickname {
-    margin: 0 0 8px 0;
-    font-size: 24px;
-    color: var(--dark-text);
+@keyframes gradientBG {
+  0% { background-position: 0% 50% }
+  50% { background-position: 100% 50% }
+  100% { background-position: 0% 50% }
 }
 
-.profile-info .creation-date {
-    margin: 0 0 12px 0;
-    color: #666;
-    font-size: 0.95em;
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0.3) 100%);
 }
 
-.reset-password button {
-    padding: 8px 16px;
-    font-size: 14px;
-    border: none;
-    border-radius: 6px;
-    background-color: var(--primary);
-    color: #fff;
-    cursor: pointer;
-    transition: var(--transition);
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  z-index: -1;
+  opacity: 0.7;
+  filter: blur(2px);
+  pointer-events: none;
+  animation: float 15s infinite linear;
 }
 
-.reset-password button:hover {
-    background-color: darken(var(--primary), 10%);
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg) }
+  50% { transform: translateY(-20px) rotate(5deg) }
 }
 
-.events h3 {
-    margin-bottom: 15px;
-    color: var(--dark-text);
+.particle:nth-child(1) {
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 42, 109, 0.4);
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
 }
 
-@media (max-width: 600px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+.particle:nth-child(2) {
+  width: 80px;
+  height: 80px;
+  background: rgba(77, 68, 255, 0.4);
+  bottom: 15%;
+  right: 10%;
+  animation-delay: -5s;
+}
 
-    .avatar {
-        width: 80px;
-        height: 80px;
-    }
+.particle:nth-child(3) {
+  width: 120px;
+  height: 120px;
+  background: rgba(5, 217, 232, 0.4);
+  bottom: 30%;
+  left: 25%;
+  animation-delay: -10s;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
+  z-index: 10;
 }
 
 .profile-button-wrapper {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 100;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 100;
 }
 
 .profile-btn {
-    display: inline-block;
-    padding: 10px 20px;
-    background: var(--primary);
-    color: #fff;
-    border-radius: var(--border-radius);
-    text-decoration: none;
-    font-weight: bold;
-    box-shadow: var(--box-shadow);
-    transition: var(--transition);
+  display: inline-block;
+  padding: 12px 24px;
+  background: linear-gradient(45deg, var(--primary), #ff6b8b);
+  color: #fff;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(255, 42, 109, 0.4);
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: 0.5s;
+}
+
+.profile-btn:hover::before {
+  left: 100%;
 }
 
 .profile-btn:hover {
-    background: darken(var(--primary), 10%);
-    transform: translateY(-2px);
+  background: linear-gradient(45deg, #ff4d8d, #ff80a6);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(255, 42, 109, 0.6);
+}
+
+.profile-card {
+  margin-top: 100px;
+  margin-left: 300px;
+  margin-right: 300px;
+  background: var(--light-bg);
+  backdrop-filter: blur(10px);
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 30px;
+  transition: var(--transition);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  animation: fadeInUp 0.8s ease;
+}
+
+.profile-card::before {
+  pointer-events: none;
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  transform: rotate(45deg);
+  transition: 0.8s;
+  z-index: 1;
+}
+
+.profile-card:hover::before {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 0.8; transform: scale(1.1); }
+  100% { opacity: 0.3; transform: scale(0.8); }
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--primary);
+  box-shadow: 0 5px 15px rgba(255, 42, 109, 0.3);
+  transition: var(--transition);
+}
+
+.avatar:hover {
+  transform: scale(1.05) rotate(5deg);
+  box-shadow: 0 8px 25px rgba(255, 42, 109, 0.5);
+}
+
+.profile-info {
+  flex: 1;
+}
+
+.nickname {
+  margin: 0 0 10px 0;
+  font-size: 32px;
+  font-weight: 700;
+  background: linear-gradient(45deg, var(--primary), var(--secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.creation-date {
+  margin: 0 0 20px 0;
+  color: #666;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.reset-password {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.reset-password button {
+  padding: 12px 24px;
+  font-size: 15px;
+  border: none;
+  border-radius: var(--border-radius);
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(5, 217, 232, 0.4);
+}
+
+.reset-password button:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(5, 217, 232, 0.6);
+}
+
+.reset-password button:first-child {
+  background: linear-gradient(45deg, var(--secondary), #00c9d9);
+  color: white;
+}
+
+.reset-password button:first-child:hover {
+  background: linear-gradient(45deg, #00c9d9, #00b8c9);
+}
+
+.reset-password .logout-button {
+  background: linear-gradient(45deg, var(--danger), #fe6b70);
+  color: white;
+  box-shadow: 0 4px 15px rgba(254, 68, 80, 0.4);
+}
+
+.reset-password .logout-button:hover {
+  background: linear-gradient(45deg, #fe6b70, var(--danger));
+  box-shadow: 0 8px 25px rgba(254, 68, 80, 0.6);
+}
+
+
+.events {
+  margin-top: 30px;
+}
+
+.events h3 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--dark-text);
+  padding-bottom: 10px;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+}
+
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.event-item {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: var(--transition);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.event-item:hover {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--primary);
+  transform: translateX(5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.event-item a {
+  text-decoration: none;
+  color: var(--dark-text);
+  font-weight: 600;
+  font-size: 16px;
+  display: block;
+  margin-bottom: 6px;
+}
+
+.event-item a:hover {
+  color: var(--primary);
+}
+
+.event-meta {
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .profile-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .nickname {
+    font-size: 26px;
+  }
+
+  .profile-card {
+    padding: 20px;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .particle {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .avatar {
+    width: 80px;
+    height: 80px;
+  }
+
+  .nickname {
+    font-size: 22px;
+  }
+
+  .creation-date {
+    font-size: 14px;
+  }
+
+  .reset-password button {
+    width: 100%;
+    padding: 10px;
+  }
+}
+
+.back-to-menu {
+    margin-bottom: 20px;
+}
+
+.back-btn {
+    display: inline-block;
+    padding: 12px 24px;
+    background: linear-gradient(45deg, var(--primary), var(--primary-light));
+    color: var(--light-text);
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(255, 42, 109, 0.4);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.back-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: 0.5s;
+}
+
+.back-btn:hover::before {
+    left: 100%;
+    cursor: pointer;
+}
+
+.back-btn:hover {
+    cursor: pointer;
+    background: linear-gradient(45deg, var(--primary-light), var(--primary));
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(255, 42, 109, 0.6);
+
+}
+
+.back-btn i {
+    margin-right: 8px;
 }

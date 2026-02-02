@@ -9,19 +9,25 @@
 </head>
 <body>
     <div class="content-card profile-card">
+        <div class="back-to-menu">
+            <a href="{% url 'event_list' %}" class="back-btn">
+                <i class="fas fa-arrow-left"></i> Вернуться в главное меню
+            </a>
+        </div>
         <div class="profile-header">
-            <img src="avatar.jpg" alt="Аватар" class="avatar">
+            <img src="avatar.jpg" class="avatar">
             <div class="profile-info">
-                <h2 class="nickname">Никнейм</h2>
-                <p class="creation-date">Дата создания: 01.01.2024</p>
+                <h2 class="nickname">Nickname</h2>
+                <p class="creation-date">Creation date: 01.01.2024</p>
                 <div class="reset-password">
-                    <button>Сбросить пароль</button>
+                    <button>Reset password</button>
+                    <button class="logout-button">Log out</button>
                 </div>
             </div>
         </div>
 
         <div class="events">
-            <h3>Ивенты</h3>
+            <h3>Events</h3>
             <ul class="event-list">
                 <li class="event-item">
                     <a href="#">Event 1</a>
