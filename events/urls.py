@@ -20,5 +20,4 @@ urlpatterns = [
     path("api/events/<int:event_id>/", views.api_update_event),
     path("api/events/<int:event_id>/delete/", views.api_delete_event),
     path('<int:event_id>/remove/<int:attendee_id>/',views.remove_attendee,name='remove_attendee'),
-
 ]
