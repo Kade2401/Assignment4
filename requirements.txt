@@ -1,2 +1,4 @@
 Django>=5.2
 
+# Для API (если используешь / планируешь)
+djangorestframework>=3.15
