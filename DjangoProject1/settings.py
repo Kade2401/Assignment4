@@ -30,7 +30,9 @@ LOGIN_REDIRECT_URL = 'event_list'
 LOGOUT_REDIRECT_URL = 'login'
 
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['.onrender.com']
+
+
 
 
 # Application definition
