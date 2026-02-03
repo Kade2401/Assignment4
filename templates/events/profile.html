@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Профиль пользователя</title>
+    <title>User Profile</title>
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 </head>
 <body>
@@ -18,7 +18,6 @@
 
         <div class="profile-header">
             <img src="avatar.jpg" class="avatar">
-
             <div class="profile-info">
                 <h2 class="nickname">{{ user.username }}</h2>
                 <p class="creation-date">Creation date: {{ user.date_joined|date:"d.m.Y" }}</p>
@@ -38,29 +37,9 @@
                             Delete account
                         </button>
                     </form>
-
                 </div>
             </div>
         </div>
-
-        <div class="events">
-            <h3>Events</h3>
-            <ul class="event-list">
-                <li class="event-item">
-                    <a href="#">Event 1</a>
-                    <div class="event-meta">10.02.2026</div>
-                </li>
-                <li class="event-item">
-                    <a href="#">Event 2</a>
-                    <div class="event-meta">15.03.2026</div>
-                </li>
-                <li class="event-item">
-                    <a href="#">Event 3</a>
-                    <div class="event-meta">20.04.2026</div>
-                </li>
-            </ul>
-        </div>
-
     </div>
 </body>
 </html>
