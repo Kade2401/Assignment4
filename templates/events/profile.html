@@ -1,10 +1,11 @@
+{% load static %}
+{% load avatar_extras %}
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile</title>
-    {% load static %}
     <link rel="stylesheet" href="{% static 'css/profile.css' %}">
 </head>
 <body>
@@ -17,7 +18,28 @@
         </div>
 
         <div class="profile-header">
-            <img src="avatar.jpg" class="avatar">
+            <div
+            class="avatar"
+            style="
+                display: grid;
+                place-items: center;
+                background: radial-gradient(circle at 30% 30%, #5fa8ff, #1e6fd9);
+            "
+            >
+            <span
+                style="
+                display: block;
+                color: white;
+                font-size: 52px;
+                font-weight: 800;
+                line-height: 1;
+                margin: 0;
+                padding: 0;
+                "
+            >
+                {{ user.username|first|upper }}
+            </span>
+            </div>
             <div class="profile-info">
                 <h2 class="nickname">{{ user.username }}</h2>
                 <p class="creation-date">Creation date: {{ user.date_joined|date:"d.m.Y" }}</p>
@@ -41,5 +63,26 @@
             </div>
         </div>
     </div>
+    <script>
+  (function () {
+    const el = document.querySelector('.avatar-letter');
+    if (!el) return;
+
+    const name = (el.dataset.name || '').trim();
+    if (!name) return;
+
+    // простой стабильный "хэш" -> hue 0..359
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+      hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+    }
+    const hue = hash % 360;
+
+    el.style.background = `radial-gradient(circle at 30% 30%,
+      hsl(${hue} 85% 70%) 0%,
+      hsl(${hue} 85% 55%) 45%,
+      hsl(${hue} 85% 40%) 100%)`;
+  })();
+</script>
 </body>
 </html>
