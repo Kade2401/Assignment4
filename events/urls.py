@@ -26,5 +26,6 @@ urlpatterns = [
     path("api/events/<int:event_id>/delete/", views.api_delete_event),
     path('<int:event_id>/remove/<int:attendee_id>/',views.remove_attendee,name='remove_attendee'),
     path('events/', views.event_list, name='event_list'),
+    path("events/<int:event_id>/", views.event_detail, name="event_detail"),
     path("invite/<uuid:token>/", views.invite_checkin, name="invite_checkin"),
 ]

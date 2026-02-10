@@ -9,6 +9,12 @@ class Event(models.Model):
         on_delete=models.CASCADE,
         related_name='events'
     )
+
+    invited_users = models.ManyToManyField(
+        User,
+        related_name='invited_events',
+        blank=True
+    )
     name = models.CharField(max_length=200)
     date = models.DateTimeField()
     capacity = models.PositiveIntegerField()

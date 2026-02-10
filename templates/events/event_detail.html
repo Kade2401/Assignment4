@@ -102,15 +102,16 @@
                   <div class="attendee-info">
                     <div class="attendee-name">{{ attendee.name }}</div>
 
-                    <!-- role text (visible by default) -->
-                    <div class="attendee-role role-text">
-                      {% if attendee.role %}
-                        <span class="role-badge">{{ attendee.role }}</span>
-                      {% else %}
-                        <em style="color:#94a3b8;">no role</em>
-                      {% endif %}
-                    </div>
+                  <!-- role text (visible by default) -->
+                  <div class="attendee-role role-text">
+                    {% if attendee.role %}
+                      <span class="role-badge">{{ attendee.role }}</span>
+                    {% else %}
+                      <em style="color:#94a3b8;">no role</em>
+                    {% endif %}
+                  </div>
 
+                  {% if is_owner %}
                     <!-- edit form (hidden by default) -->
                     <form
                       method="post"
@@ -119,6 +120,7 @@
                       style="display:none;"
                     >
                       {% csrf_token %}
+
                       <input
                         class="role-input"
                         type="text"
@@ -127,7 +129,7 @@
                         placeholder="role..."
                       />
 
-                      <button type="submit" class="btn btn-primary btn-sm">
+                      <button type="submit" class="btn btn-primary btn-sm" aria-label="Save role">
                         <i class="fas fa-check"></i>
                       </button>
 
@@ -140,22 +142,26 @@
                         ✖
                       </button>
                     </form>
+                  {% endif %}
+
                   </div>
 
-                  <!-- edit button -->
-                  <button
-                    type="button"
-                    class="btn btn-outline btn-sm"
-                    onclick="enableRoleEdit({{ attendee.id }})"
-                  >
-                    <i class="fas fa-pen"></i> Edit
-                  </button>
+                  {% if is_owner %}
+                    <!-- edit button -->
+                    <button
+                      type="button"
+                      class="btn btn-outline btn-sm"
+                      onclick="enableRoleEdit({{ attendee.id }})"
+                    >
+                      <i class="fas fa-pen"></i> Edit
+                    </button>
 
-                  <!-- remove -->
-                  <form method="post" action="{% url 'remove_attendee' event.id attendee.id %}">
-                    {% csrf_token %}
-                    <button class="icon-btn" type="submit" aria-label="Remove">❌</button>
-                  </form>
+                    <!-- remove -->
+                    <form method="post" action="{% url 'remove_attendee' event.id attendee.id %}">
+                      {% csrf_token %}
+                      <button class="icon-btn" type="submit" aria-label="Remove">❌</button>
+                    </form>
+                  {% endif %}
 
                 </div>
               {% empty %}
@@ -169,34 +175,36 @@
 
         <!-- RIGHT: Register -->
         <div>
-          {% if not is_full %}
-            <div class="content-card register-card" style="background:#f0f9ff; border:1px dashed var(--primary); margin:0;">
-              <h3 style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
-                <i class="fas fa-user-plus" style="color:var(--primary);"></i> Register New Attendee
-              </h3>
+          {% if is_owner %}
+            {% if event.attendees.count < event.capacity %}
+              <div class="content-card register-card" style="background:#f0f9ff; border:1px dashed var(--primary); margin:0;">
+                <h3 style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+                  <i class="fas fa-user-plus" style="color:var(--primary);"></i> Register New Attendee
+                </h3>
 
-              <form method="post" action="{% url 'register_attendee' event.id %}">
-                {% csrf_token %}
+                <form method="post" action="{% url 'register_attendee' event.id %}">
+                  {% csrf_token %}
 
-                <div class="form-group">
-                  <label for="id_name">Attendee Name</label>
-                  {{ form.name }}
-                </div>
+                  <div class="form-group">
+                    <label for="id_name">Attendee Name</label>
+                    {{ form.name }}
+                  </div>
 
-                <div class="form-group">
-                  <label for="id_role">Role</label>
-                  {{ form.role }}
-                </div>
+                  <div class="form-group">
+                    <label for="id_role">Role</label>
+                    {{ form.role }}
+                  </div>
 
-                <button type="submit" class="btn btn-primary">
-                  Register
-                </button>
-              </form>
-            </div>
-          {% else %}
-            <div class="message warning" style="margin-top: 24px;">
-              <i class="fas fa-exclamation-triangle"></i> Event is full! No new registrations allowed.
-            </div>
+                  <button type="submit" class="btn btn-primary">
+                    Register
+                  </button>
+                </form>
+              </div>
+            {% else %}
+              <div class="message warning" style="margin-top: 24px;">
+                <i class="fas fa-exclamation-triangle"></i> Event is full! No new registrations allowed.
+              </div>
+            {% endif %}
           {% endif %}
         </div>
 
@@ -218,17 +226,19 @@
     {% endif %}
       <!-- FOOTER BUTTONS -->
       <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;">
-        <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">
-          <i class="fas fa-edit"></i> Edit Event
-        </a>
-        <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">
-          <i class="fas fa-trash-alt"></i> Delete Event
-        </a>
+        {% if is_owner %}
+          <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">
+            <i class="fas fa-edit"></i> Edit Event
+          </a>
+          <a href="{% url 'delete_event' event.id %}" class="btn btn-danger">
+            <i class="fas fa-trash-alt"></i> Delete Event
+          </a>
+        {% endif %}
+
         <a href="{% url 'event_list' %}" class="btn btn-outline">
           <i class="fas fa-arrow-left"></i> Back to Events
         </a>
       </div>
-
     </div>
   </div>
 
@@ -269,6 +279,7 @@
   {% endif %}
 
   <!-- ROLE EDIT SCRIPT (always available) -->
+  {% if is_owner %}
   <script>
     function enableRoleEdit(attendeeId) {
       const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
@@ -294,6 +305,6 @@
       roleForm.style.display = "none";
     }
   </script>
-
+  {% endif %}
 </body>
 </html>

@@ -63,7 +63,7 @@ class AttendeeForm(forms.ModelForm):
         fields = ['name', 'role']
         widgets = {
             'role': forms.TextInput(attrs={
-                'placeholder': 'например: guest / speaker / VIP',
+                'placeholder': 'Example: guest / speaker / VIP',
                 'class': 'form-control'
             })
         }

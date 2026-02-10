@@ -24,13 +24,14 @@
         </div>
       {% else %}
         <div class="message warning">
-          Please enter your name to register.
+          You were invited to this event.
         </div>
 
         <form method="post">
           {% csrf_token %}
-          {{ form.as_p }}
-          <button type="submit" class="btn btn-primary">Register</button>
+          <button type="submit" class="btn btn-primary">
+            ✅ Accept invitation
+          </button>
         </form>
       {% endif %}
     </div>
