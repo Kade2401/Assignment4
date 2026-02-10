@@ -12,13 +12,13 @@
   <div class="particle"></div>
   <div class="particle"></div>
   
-<div class="profile-button-wrapper">
+  <div class="profile-button-wrapper">
     {% if user.is_authenticated %}
-        <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
+      <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
     {% else %}
-        <a href="{% url 'login' %}" class="profile-btn">Log in</a>
+      <a href="{% url 'login' %}" class="profile-btn">Log in</a>
     {% endif %}
-</div>
+  </div>
 
   <div class="container">
     <div class="content-card fade-in-up">
@@ -33,6 +33,153 @@
         <a href="{% url 'create_event' %}" class="btn btn-primary btn-create">Create New Event</a>
       </div>
 
+      <div class="filters-container">
+        <div class="filters-header">
+          <button id="toggleFiltersBtn" class="filter-toggle-btn">
+            🔍 Filters & Sort
+          </button>
+        </div>
+        
+        <div id="filtersContent" class="filter-section">
+          <form method="get" action="{% url 'event_list' %}">
+            
+            <div class="filter-row">
+              <div class="filter-group" style="min-width: auto;">
+                <label>Filter mode:</label>
+                <div class="radio-group">
+                  <label class="radio-option">
+                    <input type="radio" name="filter_mode" value="date" 
+                           {% if request.GET.filter_mode == 'date' or not request.GET.filter_mode %}checked{% endif %}
+                           onchange="toggleFilterMode()">
+                    <span>📅 Date</span>
+                  </label>
+                  
+                  <label class="radio-option">
+                    <input type="radio" name="filter_mode" value="attendees" 
+                           {% if request.GET.filter_mode == 'attendees' %}checked{% endif %}
+                           onchange="toggleFilterMode()">
+                    <span>👥 Attendees</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div id="dateFilterSection" class="filter-section {% if request.GET.filter_mode != 'attendees' %}active{% endif %}">
+              <div class="filter-row">
+                <div class="filter-group">
+                  <label>From:</label>
+                  <input type="date" name="date_from" value="{{ request.GET.date_from }}">
+                </div>
+                
+                <div class="filter-group">
+                  <label>To:</label>
+                  <input type="date" name="date_to" value="{{ request.GET.date_to }}">
+                </div>
+              </div>
+            </div>
+            
+            <div id="attendeesFilterSection" class="filter-section {% if request.GET.filter_mode == 'attendees' %}active{% endif %}">
+              <div class="filter-row">
+                <div class="filter-group" style="min-width: auto;">
+                  <label>Availability:</label>
+                  <div class="radio-group">
+                    <label class="radio-option">
+                      <input type="radio" name="availability" value="all" 
+                             {% if not request.GET.availability or request.GET.availability == 'all' %}checked{% endif %}>
+                      <span>All</span>
+                    </label>
+                    
+                    <label class="radio-option">
+                      <input type="radio" name="availability" value="available" 
+                             {% if request.GET.availability == 'available' %}checked{% endif %}>
+                      <span>Free spots</span>
+                    </label>
+                    
+                    <label class="radio-option">
+                      <input type="radio" name="availability" value="full" 
+                             {% if request.GET.availability == 'full' %}checked{% endif %}>
+                      <span>Full</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="filter-row">
+              <div class="filter-group" style="min-width: auto;">
+                <label>Sort by:</label>
+                <div class="radio-group">
+                  <label class="radio-option">
+                    <input type="radio" name="sort_by" value="date" 
+                           {% if not request.GET.sort_by or request.GET.sort_by == 'date' %}checked{% endif %}>
+                    <span>📅 New first</span>
+                  </label>
+                  
+                  <label class="radio-option">
+                    <input type="radio" name="sort_by" value="date_asc" 
+                           {% if request.GET.sort_by == 'date_asc' %}checked{% endif %}>
+                    <span>📅 Old first</span>
+                  </label>
+                  
+                  <label class="radio-option">
+                    <input type="radio" name="sort_by" value="name_asc" 
+                           {% if request.GET.sort_by == 'name_asc' %}checked{% endif %}>
+                    <span>🅰️ A→Z</span>
+                  </label>
+                  
+                  <label class="radio-option">
+                    <input type="radio" name="sort_by" value="name_desc" 
+                           {% if request.GET.sort_by == 'name_desc' %}checked{% endif %}>
+                    <span>🆉 Z→A</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="filter-buttons">
+              <button type="submit" class="btn-filter btn-apply">✅ Apply</button>
+              <a href="{% url 'event_list' %}" class="btn-filter btn-reset">🔄 Reset</a>
+            </div>
+            
+            {% if request.GET %}
+              <div class="active-filters">
+                <strong>Active:</strong>
+                {% if request.GET.filter_mode == 'date' %}
+                  {% if request.GET.date_from and request.GET.date_to %}
+                    Date: {{ request.GET.date_from }} → {{ request.GET.date_to }}
+                  {% elif request.GET.date_from %}
+                    From: {{ request.GET.date_from }}
+                  {% elif request.GET.date_to %}
+                    To: {{ request.GET.date_to }}
+                  {% endif %}
+                {% elif request.GET.filter_mode == 'attendees' %}
+                  {% if request.GET.availability == 'available' %}
+                    Free spots
+                  {% elif request.GET.availability == 'full' %}
+                    Full events
+                  {% else %}
+                    All events
+                  {% endif %}
+                {% endif %}
+                
+                {% if request.GET.sort_by %}
+                  | Sort: 
+                  {% if request.GET.sort_by == 'date' or not request.GET.sort_by %}
+                    New first
+                  {% elif request.GET.sort_by == 'date_asc' %}
+                    Old first
+                  {% elif request.GET.sort_by == 'name_asc' %}
+                    A→Z
+                  {% elif request.GET.sort_by == 'name_desc' %}
+                    Z→A
+                  {% endif %}
+                {% endif %}
+              </div>
+            {% endif %}
+          </form>
+        </div>
+      </div>
+      
       {% if events %}
         <ul class="event-list">
           {% for event in events %}
@@ -54,5 +201,37 @@
       {% endif %}
     </div>
   </div>
+
+  <script>
+    const toggleBtn = document.getElementById('toggleFiltersBtn');
+    const filtersContent = document.getElementById('filtersContent');
+    
+    toggleBtn.addEventListener('click', function() {
+      filtersContent.classList.toggle('active');
+      toggleBtn.classList.toggle('collapsed');
+    });
+
+    function toggleFilterMode() {
+      const dateSection = document.getElementById('dateFilterSection');
+      const attendeesSection = document.getElementById('attendeesFilterSection');
+      const dateRadio = document.querySelector('input[name="filter_mode"][value="date"]');
+      
+      if (dateRadio.checked) {
+        dateSection.classList.add('active');
+        attendeesSection.classList.remove('active');
+      } else {
+        dateSection.classList.remove('active');
+        attendeesSection.classList.add('active');
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.toString()) {
+        filtersContent.classList.add('active');
+        toggleBtn.classList.remove('collapsed');
+      }
+    });
+  </script>
 </body>
 </html>

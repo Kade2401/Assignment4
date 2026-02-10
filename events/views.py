@@ -12,11 +12,64 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect
+from django.utils import timezone
+from django.views.generic import ListView 
 
 @login_required
 def event_list(request):
-    events = Event.objects.filter(owner=request.user)
-    return render(request, 'events/event_list.html', {'events': events})
+    queryset = Event.objects.all()
+    
+    # Определяем режим фильтрации
+    filter_mode = request.GET.get('filter_mode', 'date')
+    
+    # === Фильтрация по датам ===
+    if filter_mode == 'date':
+        date_from = request.GET.get('date_from')
+        date_to = request.GET.get('date_to')
+        
+        if date_from:
+            queryset = queryset.filter(date__gte=date_from)
+        if date_to:
+            from datetime import datetime, time
+            date_to_datetime = datetime.combine(
+                datetime.fromisoformat(date_to).date(),
+                time(23, 59, 59)
+            )
+            queryset = queryset.filter(date__lte=date_to_datetime)
+    
+    # === Фильтрация по участникам ===
+    elif filter_mode == 'attendees':
+        availability = request.GET.get('availability', 'all')
+        
+        from django.db.models import Count, F
+        queryset = queryset.annotate(
+            attendees_count=Count('attendees')
+        )
+        
+        if availability == 'available':
+            queryset = queryset.filter(capacity__gt=F('attendees_count'))
+        elif availability == 'full':
+            queryset = queryset.filter(capacity__lte=F('attendees_count'))
+    
+    # === Сортировка ===
+    sort_by = request.GET.get('sort_by', 'date')
+    
+    if sort_by == 'date':
+        queryset = queryset.order_by('-date')  # Новые события первыми
+    elif sort_by == 'date_asc':
+        queryset = queryset.order_by('date')   # Старые события первыми
+    elif sort_by == 'name_asc':
+        queryset = queryset.order_by('name')   # A→Z
+    elif sort_by == 'name_desc':
+        queryset = queryset.order_by('-name')  # Z→A
+    
+    context = {
+        'events': queryset,
+        'filter_mode': filter_mode,
+        'sort_by': sort_by,
+    }
+    return render(request, 'events/event_list.html', context)
+
 @login_required
 def delete_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -224,3 +277,16 @@ def profile(request):
         'events': events
     }
     return render(request, 'events/profile.html', context)
+
+class EventListView(ListView):
+    model = Event
+    template_name = 'events/event_list.html'
+    context_object_name = 'events'
+    
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.request.GET.get('search'):
+            queryset = queryset.filter(name__icontains=self.request.GET['search'].strip())
+        if self.request.GET.get('future_only'):
+            queryset = queryset.filter(date__gte=timezone.now().date())
+        return queryset.order_by('date')
