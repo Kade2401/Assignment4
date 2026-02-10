@@ -167,7 +167,7 @@ def event_detail(request, event_id):
 @login_required
 def create_event(request):
     if request.method == "POST":
-        form = EventForm(request.POST)
+        form = EventForm(request.POST or None, user=request.user)
         if form.is_valid():
             event = form.save(commit=False)
             event.owner = request.user
@@ -208,7 +208,7 @@ def edit_event(request, event_id):
         return redirect("event_detail", event_id=event.id)
 
     if request.method == "POST":
-        form = EventForm(request.POST, instance=event)
+        form = EventForm(request.POST or None, instance=event, user=request.user)
         if form.is_valid():
             new_capacity = form.cleaned_data["capacity"]
             if new_capacity < event.attendees.count():
@@ -220,10 +220,12 @@ def edit_event(request, event_id):
 
             visibility = form.cleaned_data.get("visibility") or "none"
 
-            if visibility == "global" and not is_global_manager(request.user):
-                messages.error(request, "Only globals group can create global events.")
-                return render(request, "events/edit_event.html", {"form": form, "event": event})
-
+            if visibility == "global":
+                if not is_global_manager(request.user):
+                    messages.error(request, "Only globals group can create global events.")
+                    return redirect("event_list")
+                event.is_global = True
+                event.invite_only = False
             updated_event = form.save(commit=False)
 
             if visibility == "global":

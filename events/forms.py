@@ -25,14 +25,9 @@ class EventForm(forms.ModelForm):
     class Meta:
         model = Event
         fields = [
-            'name',
-            'date',
-            'capacity',
-            'location_name',
-            'location_address',
-            'latitude',
-            'longitude', 
-            "description"
+            "name", "description", "date", "capacity",
+            "location_name", "location_address",
+            "latitude", "longitude",
         ]
         widgets = {
             'date': forms.DateTimeInput(
@@ -43,10 +38,22 @@ class EventForm(forms.ModelForm):
             ),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
+            "description": forms.Textarea(
+                attrs={
+                    "rows": 4,
+                    "placeholder": "Event description (optional)"
+                }
+            ),
         }
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args,user=None, **kwargs):
         instance = kwargs.get("instance")
         super().__init__(*args, **kwargs)
+
+        if user and (not user.is_superuser) and (not user.groups.filter(name="globals").exists()):
+            self.fields["visibility"].choices = [
+                (v, label) for (v, label) in self.fields["visibility"].choices
+                if v != "global"
+            ]
 
         if instance:
             if getattr(instance, "is_global", False):

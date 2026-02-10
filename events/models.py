@@ -18,6 +18,11 @@ class Event(models.Model):
 
     name = models.CharField(max_length=200)
     date = models.DateTimeField()
+    description = models.TextField(
+        blank=True,
+        help_text="Optional event description",
+        default=""
+    )
     capacity = models.PositiveIntegerField()
     location_name = models.CharField(max_length=200, blank=True)
     location_address = models.CharField(max_length=300, blank=True)
