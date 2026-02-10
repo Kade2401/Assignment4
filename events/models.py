@@ -1,6 +1,7 @@
 from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
+import uuid
 
 class Event(models.Model):
     owner = models.ForeignKey(
@@ -15,6 +16,13 @@ class Event(models.Model):
     location_address = models.CharField(max_length=300, blank=True)
     latitude = models.DecimalField(max_digits=13, decimal_places=10, null=True, blank=True)
     longitude = models.DecimalField(max_digits=13, decimal_places=10, null=True, blank=True)
+    description = models.TextField(blank=True)
+
+    is_global = models.BooleanField(default=False)
+
+    invite_only = models.BooleanField(default=False)
+
+    qr_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     def __str__(self):
         return self.name

@@ -14,10 +14,14 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect
 from django.utils import timezone
 from django.views.generic import ListView 
+from .utils import is_global_manager
+from django.db.models import Q
+from django.urls import reverse
 
 @login_required
 def event_list(request):
-    queryset = Event.objects.all()
+    queryset = Event.objects.filter(
+        Q(owner=request.user) | Q(is_global=True, invite_only=False)).distinct()
     
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
@@ -83,6 +87,11 @@ def event_detail(request, event_id):
 
     form = AttendeeForm()
 
+    invite_url = None
+    can_see_invite = (event.invite_only and (event.owner == request.user or is_global_manager(request.user)))
+    if can_see_invite:
+        invite_url = request.build_absolute_uri(reverse("invite_checkin", args=[event.qr_token]))
+
     return render(
         request,
         'events/event_detail.html',
@@ -91,6 +100,8 @@ def event_detail(request, event_id):
             'attendees': attendees,
             'is_full': is_full,
             'form': form,
+            "invite_url": invite_url,
+            "can_see_invite": can_see_invite,
         }
     )
 
@@ -101,6 +112,25 @@ def create_event(request):
         if form.is_valid():
             event = form.save(commit=False)
             event.owner = request.user
+            if getattr(event, "is_global", False) and not is_global_manager(request.user):
+                messages.error(request, "Only 'globals' group can create global events.")
+                return redirect("event_list")
+            visibility = form.cleaned_data.get("visibility") or "none"
+
+            if visibility == "global":
+                if not is_global_manager(request.user):
+                    messages.error(request, "Only globals group can create global events.")
+                    return redirect("event_list")
+                event.is_global = True
+                event.invite_only = False
+
+            elif visibility == "invite":
+                event.is_global = False
+                event.invite_only = True
+
+            else:
+                event.is_global = False
+                event.invite_only = False
             event.save()
             messages.success(request, "Event created!")
             return redirect("event_list")
@@ -120,7 +150,26 @@ def edit_event(request, event_id):
             if new_capacity < event.attendees.count():
                 messages.error(request, "Cannot reduce capacity below current number of attendees!")
             else:
-                form.save()
+                if getattr(event, "is_global", False) and not is_global_manager(request.user):
+                    messages.error(request, "Only 'globals' group can create global events.")
+                return redirect("event_list")
+            visibility = form.cleaned_data.get("visibility") or "none"
+
+            if visibility == "global":
+                if not is_global_manager(request.user):
+                    messages.error(request, "Only globals group can create global events.")
+                    return redirect("event_list")
+                event.is_global = True
+                event.invite_only = False
+
+            elif visibility == "invite":
+                event.is_global = False
+                event.invite_only = True
+
+            else:
+                event.is_global = False
+                event.invite_only = False
+                form.update()
                 messages.success(request, "Event updated!")
                 return redirect('event_detail', event_id=event.id)
     else:
@@ -285,3 +334,33 @@ class EventListView(ListView):
         if self.request.GET.get('future_only'):
             queryset = queryset.filter(date__gte=timezone.now().date())
         return queryset.order_by('date')
+    
+def invite_checkin(request, token):
+    event = get_object_or_404(Event, qr_token=token, invite_only=True)
+
+    attendees_count = event.attendees.count()
+    is_full = attendees_count >= event.capacity
+
+    if request.method == "POST":
+        if is_full:
+            messages.error(request, "Event is full. Registration is closed.")
+            return redirect("invite_checkin", token=token)
+
+        form = AttendeeForm(request.POST)
+        if form.is_valid():
+            name = form.cleaned_data["name"]
+
+            if Attendee.objects.filter(event=event, name=name).exists():
+                messages.warning(request, "This name is already registered for this event.")
+            else:
+                Attendee.objects.create(event=event, name=name)
+                messages.success(request, "You are registered!")
+            return redirect("invite_checkin", token=token)
+    else:
+        form = AttendeeForm()
+
+    return render(request, "events/invite_checkin.html", {
+        "event": event,
+        "form": form,
+        "is_full": is_full,
+    })

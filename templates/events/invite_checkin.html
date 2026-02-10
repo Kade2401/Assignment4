@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invite Check-in</title>
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <div class="container">
+    <div class="content-card">
+      <h1>{{ event.name }}</h1>
+      <p>{{ event.date }}</p>
+
+      {% if messages %}
+        {% for message in messages %}
+          <div class="message {{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+
+      {% if is_full %}
+        <div class="message error">
+          ⚠️ Event is FULL. Registration is closed.
+        </div>
+      {% else %}
+        <div class="message warning">
+          Please enter your name to register.
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          {{ form.as_p }}
+          <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+</body>
+</html>

@@ -8,6 +8,20 @@ from django import forms
 from .models import Event
 
 class EventForm(forms.ModelForm):
+    VISIBILITY_CHOICES = [
+        ("none", "Normal"),
+        ("invite", "Private (invite-only)"),
+        ("global", "Global"),
+    ]
+
+    visibility = forms.ChoiceField(
+        choices=VISIBILITY_CHOICES,
+        widget=forms.RadioSelect,
+        required=False,
+        initial="none",
+        label="Event type",
+    )
+
     class Meta:
         model = Event
         fields = [
@@ -17,7 +31,8 @@ class EventForm(forms.ModelForm):
             'location_name',
             'location_address',
             'latitude',
-            'longitude'
+            'longitude', 
+            "description"
         ]
         widgets = {
             'date': forms.DateTimeInput(
@@ -29,6 +44,17 @@ class EventForm(forms.ModelForm):
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
+    def __init__(self, *args, **kwargs):
+        instance = kwargs.get("instance")
+        super().__init__(*args, **kwargs)
+
+        if instance:
+            if getattr(instance, "is_global", False):
+                self.fields["visibility"].initial = "global"
+            elif getattr(instance, "invite_only", False):
+                self.fields["visibility"].initial = "invite"
+            else:
+                self.fields["visibility"].initial = "none"
 
 
 class AttendeeForm(forms.ModelForm):
