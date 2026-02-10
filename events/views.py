@@ -18,6 +18,8 @@ from .utils import is_global_manager
 from django.db.models import Q
 from django.urls import reverse
 from django.http import HttpResponseForbidden
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 @login_required
 def event_list(request):
@@ -25,6 +27,8 @@ def event_list(request):
         Q(owner=request.user)
         | Q(invited_users=request.user)
         | Q(is_global=True, invite_only=False)
+    ).filter(
+        owner__isnull=False
     ).distinct()
     
     date_from = request.GET.get('date_from')
@@ -85,9 +89,46 @@ def delete_event(request, event_id):
 
 from django.http import HttpResponseForbidden
 
+
+@login_required
+def api_profile_events(request):
+    qs = Event.objects.filter(
+        Q(owner=request.user)
+        | Q(invited_users=request.user)
+        | Q(is_global=True, invite_only=False)
+    ).distinct()
+
+    data = []
+    for e in qs:
+        if e.latitude is None or e.longitude is None:
+            continue
+
+        data.append({
+            "id": e.id,
+            "name": e.name,
+            "date": str(e.date),
+            "location_name": e.location_name or "",
+            "location_address": e.location_address or "",
+            "lat": float(e.latitude),
+            "lng": float(e.longitude),
+            "url": f"/{e.id}/",  # если event_detail по /<id>/
+            "is_global": bool(e.is_global),
+        })
+
+    return JsonResponse({"events": data})
+
+
 @login_required
 def event_detail(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
+    event = get_object_or_404(Event, id=event_id, owner__isnull=False)
+
+    if event.invite_only:
+        if not (
+                request.user == event.owner
+                or request.user in event.invited_users.all()
+                or request.user.is_superuser
+        ):
+            return redirect("event_list")
 
     is_owner = (event.owner == request.user)
     is_invited = event.invited_users.filter(id=request.user.id).exists()
@@ -420,3 +461,7 @@ def join_event(request, event_id):
 
     messages.success(request, "You are registered for this global event!")
     return redirect("event_detail", event_id=event.id)
+
+@receiver(pre_delete, sender=Event)
+def cleanup_event(sender, instance, **kwargs):
+    instance.invited_users.clear()

@@ -29,4 +29,6 @@ urlpatterns = [
     path("events/<int:event_id>/", views.event_detail, name="event_detail"),
     path("invite/<uuid:token>/", views.invite_checkin, name="invite_checkin"),
     path("events/<int:event_id>/join/", views.join_event, name="join_event"),
+    path("api/profile-events/", views.api_profile_events, name="api_profile_events"),
+
 ]

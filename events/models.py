@@ -12,9 +12,10 @@ class Event(models.Model):
 
     invited_users = models.ManyToManyField(
         User,
-        related_name='invited_events',
-        blank=True
+        blank=True,
+        related_name="invited_events"
     )
+
     name = models.CharField(max_length=200)
     date = models.DateTimeField()
     capacity = models.PositiveIntegerField()
