@@ -167,13 +167,11 @@ def event_detail(request, event_id):
 @login_required
 def create_event(request):
     if request.method == "POST":
-        form = EventForm(request.POST or None, user=request.user)
+        form = EventForm(request.POST, request.FILES or None, user=request.user)
         if form.is_valid():
             event = form.save(commit=False)
             event.owner = request.user
-            if getattr(event, "is_global", False) and not is_global_manager(request.user):
-                messages.error(request, "Only 'globals' group can create global events.")
-                return redirect("event_list")
+
             visibility = form.cleaned_data.get("visibility") or "none"
 
             if visibility == "global":
@@ -182,21 +180,22 @@ def create_event(request):
                     return redirect("event_list")
                 event.is_global = True
                 event.invite_only = False
-
             elif visibility == "invite":
                 event.is_global = False
                 event.invite_only = True
-
             else:
                 event.is_global = False
                 event.invite_only = False
+
             event.save()
+            form.save_m2m()
             messages.success(request, "Event created!")
             return redirect("event_list")
-        else:
-            print(form.errors)
+
+        messages.error(request, f"Form errors: {form.errors}")
     else:
-        form = EventForm()
+        form = EventForm(user=request.user)
+
     return render(request, "events/create_event.html", {"form": form})
 
 @login_required

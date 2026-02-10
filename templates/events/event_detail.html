@@ -272,76 +272,64 @@
 
   <!-- MAP SCRIPT (only if coords exist) -->
   {% if event.latitude and event.longitude %}
-    <script>
-      let eventMapInitialized = false;
-      let eventMap;
-      let eventMarker;
+      <script>
+        let eventMapInitialized = false;
+        let eventMap;
 
-      function toggleEventMap() {
-        const wrap = document.getElementById("event-map-wrap");
-        const mapEl = document.getElementById("event-map");
+        function toggleEventMap() {
+          const wrap = document.getElementById("event-map-wrap");
+          const isOpen = wrap.style.display !== "none";
 
-        const isOpen = wrap.style.display !== "none";
-        wrap.style.display = isOpen ? "none" : "block";
+          wrap.style.display = isOpen ? "none" : "block";
 
-        // гарантируем ширину (на случай если CSS не применился)
-        wrap.style.width = "100%";
-        mapEl.style.width = "100%";
+          if (!eventMapInitialized) {
+            const lat = {{ event.latitude|floatformat:6 }};
+            const lng = {{ event.longitude|floatformat:6 }};
 
-        const lat = {{ event.latitude|floatformat:6 }};
-        const lng = {{ event.longitude|floatformat:6 }};
+            eventMap = L.map("event-map").setView([lat, lng], 15);
 
-        if (!eventMapInitialized) {
-          eventMap = L.map("event-map").setView([lat, lng], 15);
+            L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+              attribution: "© OpenStreetMap contributors",
+            }).addTo(eventMap);
 
-          L.tileLayer("https://{s}.tile.openstreetmap.org/%7Bz%7D/%7Bx%7D/%7By%7D.png", {
-            attribution: "© OpenStreetMap contributors",
-          }).addTo(eventMap);
+            L.marker([lat, lng]).addTo(eventMap);
 
-          eventMarker = L.marker([lat, lng]).addTo(eventMap);
-          eventMapInitialized = true;
+            eventMapInitialized = true;
+          }
+
+          if (!isOpen) {
+            setTimeout(() => eventMap.invalidateSize(), 150);
+          }
+        }
+      </script>
+    {% endif %}
+
+    {% if is_owner %}
+      <script>
+        function enableRoleEdit(attendeeId) {
+          const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
+          const roleText = row.querySelector(".role-text");
+          const roleForm = row.querySelector(".role-form");
+          const input = row.querySelector(".role-input");
+
+          roleText.style.display = "none";
+          roleForm.style.display = "flex";
+
+          if (input) {
+            input.focus();
+            input.select();
+          }
         }
 
-        // Когда открываем — Leaflet должен пересчитать размеры
-        if (!isOpen) {
-          setTimeout(() => {
-            eventMap.invalidateSize();
-            // лёгкий "пинок", чтобы точно перерисовалось
-            eventMap.setView([lat, lng], eventMap.getZoom(), { animate: false });
-          }, 300);
+        function cancelRoleEdit(attendeeId) {
+          const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
+          const roleText = row.querySelector(".role-text");
+          const roleForm = row.querySelector(".role-form");
+
+          roleText.style.display = "flex";
+          roleForm.style.display = "none";
         }
-      }
-    </script>
-  {% endif %}
-
-
-  <!-- ROLE EDIT SCRIPT (always available) -->
-  {% if is_owner %}
-  <script>
-    function enableRoleEdit(attendeeId) {
-      const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
-      const roleText = row.querySelector(".role-text");
-      const roleForm = row.querySelector(".role-form");
-      const input = row.querySelector(".role-input");
-
-      roleText.style.display = "none";
-      roleForm.style.display = "flex";
-
-      if (input) {
-        input.focus();
-        input.select();
-      }
-    }
-
-    function cancelRoleEdit(attendeeId) {
-      const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
-      const roleText = row.querySelector(".role-text");
-      const roleForm = row.querySelector(".role-form");
-
-      roleText.style.display = "flex";
-      roleForm.style.display = "none";
-    }
-  </script>
-  {% endif %}
-</body>
+      </script>
+    {% endif %}
+  </body>
 </html>
