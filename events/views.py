@@ -48,25 +48,27 @@ def event_detail(request, event_id):
         }
     )
 
-
-@login_required
 @login_required
 def create_event(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EventForm(request.POST)
         if form.is_valid():
             event = form.save(commit=False)
             event.owner = request.user
             event.save()
-            return redirect('event_list')
+            messages.success(request, "Event created!")
+            return redirect("event_list")  # <- здесь редирект
+        else:
+            print(form.errors)  # отладка
     else:
         form = EventForm()
+    return render(request, "events/create_event.html", {"form": form})
 
-    return render(request, 'events/create_event.html', {'form': form})
+
 @login_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
-    if request.method == 'POST':
+    if request.method == "POST":
         form = EventForm(request.POST, instance=event)
         if form.is_valid():
             new_capacity = form.cleaned_data['capacity']
@@ -78,7 +80,7 @@ def edit_event(request, event_id):
                 return redirect('event_detail', event_id=event.id)
     else:
         form = EventForm(instance=event)
-    return render(request, 'events/edit_event.html', {'form': form, 'event': event})
+    return render(request, "events/edit_event.html", {"form": form, "event": event})
 
 @login_required
 def register_attendee(request, event_id):

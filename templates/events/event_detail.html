@@ -5,14 +5,22 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ event.name }}</title>
+
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Leaflet (бесплатная карта OSM) -->
+  <link
+    rel="stylesheet"
+    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+  />
 </head>
+
 <body>
   <div class="particle"></div>
   <div class="particle"></div>
   <div class="particle"></div>
-  
+
   <div class="profile-button-wrapper">
     {% if user.is_authenticated %}
         <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
@@ -34,13 +42,44 @@
       <div style="display: flex; justify-content: space-between; align-items-start; margin-bottom: 24px; flex-wrap: wrap;">
         <div>
           <h1 class="gradient-text">{{ event.name }}</h1>
+
           <p style="color: #64748b; font-size: 18px; margin-top: 4px;">
             <i class="fas fa-calendar-day"></i> {{ event.date }}
           </p>
+
+          <!-- ✅ LOCATION TEXT + BUTTON + COLLAPSIBLE MAP -->
+          {% if event.location_name or event.location_address %}
+            <p style="color:#64748b; font-size:16px; margin-top: 6px;">
+              <i class="fas fa-location-dot"></i>
+              {% if event.location_name %}<strong>{{ event.location_name }}</strong>{% endif %}
+              {% if event.location_address %}
+                {% if event.location_name %} — {% endif %}
+                {{ event.location_address }}
+              {% endif %}
+            </p>
+          {% endif %}
+
+          {% if event.latitude and event.longitude %}
+            <button
+              type="button"
+              class="btn btn-outline btn-map"
+              onclick="toggleEventMap()"
+              style="margin-top: 10px;"
+            >
+              <i class="fas fa-map"></i> Show on map
+            </button>
+
+            <div id="event-map-wrap" style="display:none; margin-top: 14px;">
+              <div id="event-map" style="height: 320px; border-radius: 12px; overflow:hidden;"></div>
+            </div>
+          {% endif %}
+          <!-- ✅ END LOCATION BLOCK -->
+
         </div>
+
         <div style="text-align: right; margin-top: 10px;">
-          <div style="background: {% if is_full %}#fee2e2{% else %}#dcfce7{% endif %}; 
-                      color: {% if is_full %}#b91c1c{% else %}#166534{% endif %}; 
+          <div style="background: {% if is_full %}#fee2e2{% else %}#dcfce7{% endif %};
+                      color: {% if is_full %}#b91c1c{% else %}#166534{% endif %};
                       padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-block;
                       margin-top: 10px;">
             <i class="fas {% if is_full %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
@@ -54,41 +93,38 @@
           <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
             <i class="fas fa-users"></i> Attendees ({{ event.attendees.count }}/{{ event.capacity }})
           </h3>
-          
+
           <div style="background: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 16px;">
             {% for attendee in attendees %}
-  <div style="display: flex; justify-content: space-between;">
-    <span>{{ attendee.name }}</span>
+              <div style="display: flex; justify-content: space-between;">
+                <span>{{ attendee.name }}</span>
 
-    <form method="post"
-          action="{% url 'remove_attendee' event.id attendee.id %}">
-      {% csrf_token %}
-      <button type="submit">❌</button>
-    </form>
-  </div>
-{% endfor %}
-
+                <form method="post" action="{% url 'remove_attendee' event.id attendee.id %}">
+                  {% csrf_token %}
+                  <button type="submit">❌</button>
+                </form>
+              </div>
+            {% endfor %}
           </div>
         </div>
-        
+
         <div style="flex: 1; min-width: 300px;">
           {% if not is_full %}
             <div class="content-card" style="background: #f0f9ff; border: 1px dashed var(--primary);">
               <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
                 <i class="fas fa-user-plus" style="color: var(--primary);"></i> Register New Attendee
               </h3>
-              
-              <form method="post" action="{% url 'register_attendee' event.id %}">
-  {% csrf_token %}
-  <div class="form-group">
-    <label for="id_name">Attendee Name</label>
-    {{ form.name }}
-  </div>
-  <button type="submit" class="btn btn-primary">
-    Register Attendee
-  </button>
-</form>
 
+              <form method="post" action="{% url 'register_attendee' event.id %}">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label for="id_name">Attendee Name</label>
+                  {{ form.name }}
+                </div>
+                <button type="submit" class="btn btn-primary">
+                  Register Attendee
+                </button>
+              </form>
             </div>
           {% else %}
             <div class="message warning" style="margin-top: 24px;">
@@ -109,7 +145,46 @@
           <i class="fas fa-arrow-left"></i> Back to Events
         </a>
       </div>
+
     </div>
   </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  {% if event.latitude and event.longitude %}
+  <script>
+    let eventMapInitialized = false;
+    let eventMap;
+
+    function toggleEventMap() {
+      const wrap = document.getElementById("event-map-wrap");
+      const isOpen = wrap.style.display !== "none";
+
+      wrap.style.display = isOpen ? "none" : "block";
+
+      if (!eventMapInitialized) {
+        const lat = {{ event.latitude|floatformat:6 }};
+        const lng = {{ event.longitude|floatformat:6 }};
+
+        eventMap = L.map("event-map").setView([lat, lng], 15);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: "© OpenStreetMap contributors",
+        }).addTo(eventMap);
+
+        L.marker([lat, lng]).addTo(eventMap);
+
+        eventMapInitialized = true;
+      }
+
+      // если карта была скрыта, Leaflet нужно обновить размеры
+      if (!isOpen) {
+        setTimeout(() => eventMap.invalidateSize(), 150);
+      }
+    }
+  </script>
+  {% endif %}
+
 </body>
 </html>

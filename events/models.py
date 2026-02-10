@@ -7,10 +7,14 @@ class Event(models.Model):
         on_delete=models.CASCADE,
         related_name='events'
     )
-
     name = models.CharField(max_length=200)
     date = models.DateField()
     capacity = models.PositiveIntegerField()
+
+    location_name = models.CharField(max_length=200, blank=True)
+    location_address = models.CharField(max_length=300, blank=True)
+    latitude = models.DecimalField(max_digits=13, decimal_places=10, null=True, blank=True)
+    longitude = models.DecimalField(max_digits=13, decimal_places=10, null=True, blank=True)
 
     def __str__(self):
         return self.name
@@ -26,7 +30,7 @@ class Attendee(models.Model):
     event = models.ForeignKey(Event, related_name='attendees', on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('name', 'event')  # чтобы избежать дубликатов
+        unique_together = ('name', 'event') 
 
     def __str__(self):
         return f"{self.name} ({self.event.name})"
