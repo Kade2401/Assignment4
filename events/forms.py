@@ -17,8 +17,6 @@ class EventForm(forms.ModelForm):
             'longitude': forms.HiddenInput(),
         }
 
-
-
 class AttendeeForm(forms.ModelForm):
     class Meta:
         model = Attendee

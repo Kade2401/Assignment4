@@ -57,9 +57,9 @@ def create_event(request):
             event.owner = request.user
             event.save()
             messages.success(request, "Event created!")
-            return redirect("event_list")  # <- здесь редирект
+            return redirect("event_list")
         else:
-            print(form.errors)  # отладка
+            print(form.errors)
     else:
         form = EventForm()
     return render(request, "events/create_event.html", {"form": form})

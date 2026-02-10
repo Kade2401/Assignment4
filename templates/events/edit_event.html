@@ -93,7 +93,6 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
@@ -110,13 +109,11 @@
       if (!map) {
         initMap();
       } else if (!isOpen) {
-        // когда показываем после display:none — Leaflet нужно пересчитать размеры
         setTimeout(() => map.invalidateSize(), 150);
       }
     }
 
     function initMap() {
-      // Если у ивента уже есть координаты — показываем там, иначе Алматы
       const latField = document.getElementById("id_latitude");
       const lngField = document.getElementById("id_longitude");
 
@@ -129,12 +126,10 @@
         attribution: "© OpenStreetMap contributors",
       }).addTo(map);
 
-      // Покажем маркер сразу (если координаты были)
       marker = L.marker([lat, lng]).addTo(map);
 
       map.on("click", onMapClick);
 
-      // на всякий случай, чтобы карта точно отрисовалась после открытия
       setTimeout(() => map.invalidateSize(), 150);
     }
 
@@ -151,7 +146,6 @@
       document.getElementById("id_latitude").value = lat;
       document.getElementById("id_longitude").value = lng;
 
-      // Reverse geocoding через Nominatim (бесплатно)
       fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`)
         .then((res) => res.json())
         .then((data) => {

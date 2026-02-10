@@ -9,7 +9,6 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <!-- Leaflet (бесплатная карта OSM) -->
   <link
     rel="stylesheet"
     href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
@@ -47,7 +46,6 @@
             <i class="fas fa-calendar-day"></i> {{ event.date }}
           </p>
 
-          <!-- ✅ LOCATION TEXT + BUTTON + COLLAPSIBLE MAP -->
           {% if event.location_name or event.location_address %}
             <p style="color:#64748b; font-size:16px; margin-top: 6px;">
               <i class="fas fa-location-dot"></i>
@@ -73,7 +71,6 @@
               <div id="event-map" style="height: 320px; border-radius: 12px; overflow:hidden;"></div>
             </div>
           {% endif %}
-          <!-- ✅ END LOCATION BLOCK -->
 
         </div>
 
@@ -149,7 +146,6 @@
     </div>
   </div>
 
-  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   {% if event.latitude and event.longitude %}
@@ -178,7 +174,6 @@
         eventMapInitialized = true;
       }
 
-      // если карта была скрыта, Leaflet нужно обновить размеры
       if (!isOpen) {
         setTimeout(() => eventMap.invalidateSize(), 150);
       }
