@@ -34,9 +34,26 @@ class EventForm(forms.ModelForm):
 class AttendeeForm(forms.ModelForm):
     class Meta:
         model = Attendee
-        fields = ['name']
+        fields = ['name', 'role']
+        widgets = {
+            'role': forms.TextInput(attrs={
+                'placeholder': 'например: guest / speaker / VIP',
+                'class': 'form-control'
+            })
+        }
 
 class RegisterForm(UserCreationForm):
     class Meta:
         model = User
         fields = ("username", "password1", "password2")
+
+class AttendeeRoleForm(forms.ModelForm):
+    class Meta:
+        model = Attendee
+        fields = ['role']
+        widgets = {
+            'role': forms.TextInput(attrs={
+                'placeholder': 'New role',
+                'class': 'form-control'
+            })
+        }

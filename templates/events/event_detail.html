@@ -9,10 +9,7 @@
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-  <link
-    rel="stylesheet"
-    href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-  />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 </head>
 
 <body>
@@ -22,14 +19,15 @@
 
   <div class="profile-button-wrapper">
     {% if user.is_authenticated %}
-        <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
+      <a href="{% url 'profile' %}" class="profile-btn">Profile</a>
     {% else %}
-        <a href="{% url 'login' %}" class="profile-btn">Log in</a>
+      <a href="{% url 'login' %}" class="profile-btn">Log in</a>
     {% endif %}
   </div>
 
   <div class="container">
     <div class="content-card fade-in-up">
+
       {% if messages %}
         {% for message in messages %}
           <div class="message {{ message.tags }}">
@@ -38,16 +36,17 @@
         {% endfor %}
       {% endif %}
 
-      <div style="display: flex; justify-content: space-between; align-items-start; margin-bottom: 24px; flex-wrap: wrap;">
+      <!-- HEADER -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:24px;">
         <div>
           <h1 class="gradient-text">{{ event.name }}</h1>
 
-          <p style="color: #64748b; font-size: 18px; margin-top: 4px;">
+          <p style="color:#64748b; font-size:18px; margin-top:6px;">
             <i class="fas fa-calendar-day"></i> {{ event.date|date:"d.m.Y H:i" }}
           </p>
 
           {% if event.location_name or event.location_address %}
-            <p style="color:#64748b; font-size:16px; margin-top: 6px;">
+            <p style="color:#64748b; font-size:16px; margin-top:8px;">
               <i class="fas fa-location-dot"></i>
               {% if event.location_name %}<strong>{{ event.location_name }}</strong>{% endif %}
               {% if event.location_address %}
@@ -58,66 +57,137 @@
           {% endif %}
 
           {% if event.latitude and event.longitude %}
-            <button
-              type="button"
-              class="btn btn-outline btn-map"
-              onclick="toggleEventMap()"
-              style="margin-top: 10px;"
-            >
+            <button type="button" class="btn btn-outline btn-map" onclick="toggleEventMap()" style="margin-top:12px;">
               <i class="fas fa-map"></i> Show on map
             </button>
 
-            <div id="event-map-wrap" style="display:none; margin-top: 14px;">
-              <div id="event-map" style="height: 320px; border-radius: 12px; overflow:hidden;"></div>
+            <div id="event-map-wrap" style="display:none; margin-top:14px;">
+              <div id="event-map" style="height:320px; border-radius:12px; overflow:hidden;"></div>
             </div>
           {% endif %}
-
         </div>
 
-        <div style="text-align: right; margin-top: 10px;">
-          <div style="background: {% if is_full %}#fee2e2{% else %}#dcfce7{% endif %};
-                      color: {% if is_full %}#b91c1c{% else %}#166534{% endif %};
-                      padding: 8px 16px; border-radius: 20px; font-weight: 600; display: inline-block;
-                      margin-top: 10px;">
+        <div style="text-align:right; margin-top:6px;">
+          <div style="
+            background: {% if is_full %}#fee2e2{% else %}#dcfce7{% endif %};
+            color: {% if is_full %}#b91c1c{% else %}#166534{% endif %};
+            padding:10px 16px;
+            border-radius:999px;
+            font-weight:700;
+            display:inline-flex;
+            gap:10px;
+            align-items:center;
+          ">
             <i class="fas {% if is_full %}fa-times-circle{% else %}fa-check-circle{% endif %}"></i>
             {% if is_full %}FULL{% else %}{{ event.available_spots }} spots left{% endif %}
           </div>
         </div>
       </div>
 
-      <div style="display: flex; gap: 24px; margin-bottom: 32px; flex-wrap: wrap;">
-        <div style="flex: 1; min-width: 300px;">
-          <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
+      <!-- MAIN GRID -->
+      <div class="attendees-grid">
+
+        <!-- LEFT: Attendees -->
+        <div>
+          <h3 style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
             <i class="fas fa-users"></i> Attendees ({{ event.attendees.count }}/{{ event.capacity }})
           </h3>
 
-          <div style="background: rgba(255, 255, 255, 0.7); border-radius: 8px; padding: 16px;">
-            {% for attendee in attendees %}
-              <div style="display: flex; justify-content: space-between;">
-                <span>{{ attendee.name }}</span>
+          <div class="attendees-panel">
+            <div class="attendees-list">
+              {% for attendee in attendees %}
+                <div class="attendee-row" data-attendee="{{ attendee.id }}">
 
-                <form method="post" action="{% url 'remove_attendee' event.id attendee.id %}">
-                  {% csrf_token %}
-                  <button type="submit">❌</button>
-                </form>
-              </div>
-            {% endfor %}
+                  <!-- info -->
+                  <div class="attendee-info">
+                    <div class="attendee-name">{{ attendee.name }}</div>
+
+                    <!-- role text (visible by default) -->
+                    <div class="attendee-role role-text">
+                      {% if attendee.role %}
+                        <span class="role-badge">{{ attendee.role }}</span>
+                      {% else %}
+                        <em style="color:#94a3b8;">no role</em>
+                      {% endif %}
+                    </div>
+
+                    <!-- edit form (hidden by default) -->
+                    <form
+                      method="post"
+                      action="{% url 'update_attendee_role' event.id attendee.id %}"
+                      class="role-form"
+                      style="display:none;"
+                    >
+                      {% csrf_token %}
+                      <input
+                        class="role-input"
+                        type="text"
+                        name="role"
+                        value="{{ attendee.role }}"
+                        placeholder="role..."
+                      />
+
+                      <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fas fa-check"></i>
+                      </button>
+
+                      <button
+                        type="button"
+                        class="icon-btn"
+                        onclick="cancelRoleEdit({{ attendee.id }})"
+                        aria-label="Cancel"
+                      >
+                        ✖
+                      </button>
+                    </form>
+                  </div>
+
+                  <!-- edit button -->
+                  <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    onclick="enableRoleEdit({{ attendee.id }})"
+                  >
+                    <i class="fas fa-pen"></i> Edit
+                  </button>
+
+                  <!-- remove -->
+                  <form method="post" action="{% url 'remove_attendee' event.id attendee.id %}">
+                    {% csrf_token %}
+                    <button class="icon-btn" type="submit" aria-label="Remove">❌</button>
+                  </form>
+
+                </div>
+              {% empty %}
+                <div style="color:#64748b; padding:10px;">
+                  No attendees yet.
+                </div>
+              {% endfor %}
+            </div>
           </div>
         </div>
 
-        <div style="flex: 1; min-width: 300px;">
+        <!-- RIGHT: Register -->
+        <div>
           {% if not is_full %}
-            <div class="content-card" style="background: #f0f9ff; border: 1px dashed var(--primary);">
-              <h3 style="margin-bottom: 16px; display: flex; align-items: center; gap: 8px;">
-                <i class="fas fa-user-plus" style="color: var(--primary);"></i> Register New Attendee
+            <div class="content-card" style="background:#f0f9ff; border:1px dashed var(--primary); margin:0;">
+              <h3 style="margin-bottom:16px; display:flex; align-items:center; gap:10px;">
+                <i class="fas fa-user-plus" style="color:var(--primary);"></i> Register New Attendee
               </h3>
 
               <form method="post" action="{% url 'register_attendee' event.id %}">
                 {% csrf_token %}
+
                 <div class="form-group">
                   <label for="id_name">Attendee Name</label>
                   {{ form.name }}
                 </div>
+
+                <div class="form-group">
+                  <label for="id_role">Role</label>
+                  {{ form.role }}
+                </div>
+
                 <button type="submit" class="btn btn-primary">
                   Register Attendee
                 </button>
@@ -129,9 +199,11 @@
             </div>
           {% endif %}
         </div>
+
       </div>
 
-      <div style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">
+      <!-- FOOTER BUTTONS -->
+      <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;">
         <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">
           <i class="fas fa-edit"></i> Edit Event
         </a>
@@ -148,6 +220,7 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
+  <!-- MAP SCRIPT (only if coords exist) -->
   {% if event.latitude and event.longitude %}
   <script>
     let eventMapInitialized = false;
@@ -180,6 +253,33 @@
     }
   </script>
   {% endif %}
+
+  <!-- ROLE EDIT SCRIPT (always available) -->
+  <script>
+    function enableRoleEdit(attendeeId) {
+      const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
+      const roleText = row.querySelector(".role-text");
+      const roleForm = row.querySelector(".role-form");
+      const input = row.querySelector(".role-input");
+
+      roleText.style.display = "none";
+      roleForm.style.display = "flex";
+
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+
+    function cancelRoleEdit(attendeeId) {
+      const row = document.querySelector(`[data-attendee="${attendeeId}"]`);
+      const roleText = row.querySelector(".role-text");
+      const roleForm = row.querySelector(".role-form");
+
+      roleText.style.display = "flex";
+      roleForm.style.display = "none";
+    }
+  </script>
 
 </body>
 </html>

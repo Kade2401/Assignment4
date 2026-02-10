@@ -13,7 +13,6 @@ from django.contrib.auth import logout
 from django.contrib.auth import authenticate, login
 from django.shortcuts import redirect
 
-
 @login_required
 def event_list(request):
     events = Event.objects.filter(owner=request.user)
@@ -28,7 +27,6 @@ def delete_event(request, event_id):
         return redirect('event_list')
     return render(request, 'events/confirm_delete.html', {'event': event})
 
-@login_required
 @login_required
 def event_detail(request, event_id):
     event = get_object_or_404(Event, id=event_id, owner=request.user)
@@ -64,7 +62,6 @@ def create_event(request):
         form = EventForm()
     return render(request, "events/create_event.html", {"form": form})
 
-
 @login_required
 def edit_event(request, event_id):
     event = get_object_or_404(Event, id=event_id)
@@ -85,18 +82,39 @@ def edit_event(request, event_id):
 @login_required
 def register_attendee(request, event_id):
     event = get_object_or_404(Event, id=event_id)
+
     if request.method == 'POST':
         form = AttendeeForm(request.POST)
         if form.is_valid():
             name = form.cleaned_data['name']
+            role = form.cleaned_data.get('role', '').strip()
+
             if event.is_full():
                 messages.error(request, "Cannot register. Event is full!")
             elif Attendee.objects.filter(name=name, event=event).exists():
                 messages.warning(request, f"{name} is already registered.")
             else:
-                Attendee.objects.create(name=name, event=event)
+                Attendee.objects.create(
+                    name=name,
+                    role=role,
+                    event=event
+                )
                 messages.info(request, f"{name} successfully registered!")
     return redirect('event_detail', event_id=event.id)
+
+@login_required
+def update_attendee_role(request, event_id, attendee_id):
+    event = get_object_or_404(Event, id=event_id, owner=request.user)
+    attendee = get_object_or_404(Attendee, id=attendee_id, event=event)
+
+    if request.method == "POST":
+        new_role = request.POST.get("role", "").strip()
+        attendee.role = new_role
+        attendee.save()
+        messages.success(request, f"Role updated for {attendee.name}")
+
+    return redirect("event_detail", event_id=event.id)
+
 
 @login_required
 def remove_attendee(request, event_id, attendee_id):
@@ -115,7 +133,6 @@ def api_event_list(request):
             'id', 'name', 'date', 'capacity'
         )
         return JsonResponse(list(events), safe=False)
-
 
 @csrf_exempt
 def api_create_event(request):

@@ -46,7 +46,7 @@ body {
   color: var(--dark-text);
   line-height: 1.6;
   padding: 20px;
-  max-width: 900px;
+  max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
   position: relative;
@@ -577,5 +577,299 @@ textarea:focus {
   .profile-btn {
     padding: 10px 20px;
     font-size: 13px;
+  }
+}
+
+/* ===== Attendees layout (event_detail) ===== */
+
+.attendees-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .attendees-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.attendees-panel {
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+.attendees-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Одна строка участника */
+.attendee-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto; /* info | edit/save | remove */
+  gap: 12px;
+  align-items: center;
+
+  padding: 14px 14px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.85);
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: var(--transition);
+}
+
+.attendee-row:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px rgba(0,0,0,0.10);
+  border-color: rgba(255, 42, 109, 0.25);
+}
+
+/* Имя + роль */
+.attendee-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.attendee-name {
+  font-weight: 700;
+  font-size: 16px;
+  color: var(--dark-text);
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.attendee-role {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #64748b;
+}
+
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(5, 217, 232, 0.12);
+  border: 1px solid rgba(5, 217, 232, 0.25);
+  color: #0f766e;
+  font-weight: 600;
+}
+
+/* Кнопки компактные, но не сжатые */
+.btn-sm {
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.icon-btn {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.8);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.icon-btn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 42, 109, 0.35);
+  box-shadow: 0 10px 18px rgba(0,0,0,0.10);
+}
+
+/* Форма редактирования роли */
+.role-form {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.role-input {
+  width: 220px;
+  max-width: 32vw;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.95);
+  font-size: 14px;
+  transition: var(--transition);
+}
+
+.role-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 42, 109, 0.25);
+}
+
+@media (max-width: 600px) {
+  .attendee-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .role-input {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .role-form {
+    justify-content: flex-start;
+  }
+}
+
+/* ===== Attendees (clean + compact) ===== */
+
+.attendees-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:24px;
+  align-items:start;
+}
+@media (max-width: 900px){
+  .attendees-grid{ grid-template-columns: 1fr; }
+}
+
+.attendees-panel{
+  background: rgba(255,255,255,0.72);
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 10px 26px rgba(0,0,0,0.08);
+}
+
+.attendees-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* компактная карточка участника:
+   info | edit | remove  (всё в одну строку) */
+.attendee-row{
+  display:grid;
+  grid-template-columns: 1fr auto auto;
+  gap:10px;
+  align-items:center;
+
+  padding: 10px 12px;          /* было 14+ => стало компактнее */
+  border-radius: 12px;
+  background: rgba(255,255,255,0.88);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+.attendee-info{
+  min-width:0;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+
+.attendee-name{
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.attendee-role{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size: 13px;
+  color:#64748b;
+}
+
+/* роль как бейдж — маленький */
+.role-badge{
+  display:inline-flex;
+  align-items:center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: rgba(5, 217, 232, 0.12);
+  border: 1px solid rgba(5, 217, 232, 0.25);
+  color:#0f766e;
+  font-weight: 700;
+  font-size: 12px;
+}
+
+/* кнопки компактнее */
+.btn-sm{
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.icon-btn{
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.9);
+  cursor:pointer;
+  transition: var(--transition);
+}
+.icon-btn:hover{
+  transform: translateY(-1px);
+  border-color: rgba(255, 42, 109, 0.35);
+}
+
+/* ===== Inline edit role (compact, doesn't blow up height) ===== */
+
+/* по умолчанию форма скрыта у тебя inline style="display:none" */
+.role-form{
+  margin: 0;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap: nowrap;
+}
+
+.role-input{
+  width: 150px;        /* компактнее, чтобы не раздувать блок */
+  max-width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 2px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.95);
+  font-size: 13px;
+}
+
+.role-input:focus{
+  outline:none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(255, 42, 109, 0.22);
+}
+
+/* на телефоне переносим кнопки вниз */
+@media (max-width: 600px){
+  .attendee-row{
+    grid-template-columns: 1fr;
+    gap:10px;
+  }
+  .role-form{
+    flex-wrap: wrap;
+  }
+  .role-input{
+    width: 100%;
   }
 }

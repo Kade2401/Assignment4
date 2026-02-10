@@ -29,10 +29,11 @@ class Event(models.Model):
 
 class Attendee(models.Model):
     name = models.CharField(max_length=100)
+    role = models.CharField(max_length=50, blank=True)  # <-- добавили
     event = models.ForeignKey(Event, related_name='attendees', on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ('name', 'event') 
+        unique_together = ('name', 'event')
 
     def __str__(self):
-        return f"{self.name} ({self.event.name})"
+        return f"{self.name} - {self.role} ({self.event.name})"
