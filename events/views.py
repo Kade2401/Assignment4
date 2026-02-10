@@ -19,7 +19,6 @@ from django.views.generic import ListView
 def event_list(request):
     queryset = Event.objects.all()
     
-    # === Фильтрация по датам ===
     date_from = request.GET.get('date_from')
     date_to = request.GET.get('date_to')
     
@@ -33,7 +32,6 @@ def event_list(request):
         )
         queryset = queryset.filter(date__lte=date_to_datetime)
     
-    # === Фильтрация по участникам ===
     availability = request.GET.get('availability', 'all')
     
     if availability != 'all':
@@ -47,17 +45,16 @@ def event_list(request):
         elif availability == 'full':
             queryset = queryset.filter(capacity__lte=F('attendees_count'))
     
-    # === Сортировка ===
     sort_by = request.GET.get('sort_by', 'date')
     
     if sort_by == 'date':
-        queryset = queryset.order_by('-date')  # Новые события первыми
+        queryset = queryset.order_by('-date')
     elif sort_by == 'date_asc':
-        queryset = queryset.order_by('date')   # Старые события первыми
+        queryset = queryset.order_by('date')
     elif sort_by == 'name_asc':
-        queryset = queryset.order_by('name')   # A→Z
+        queryset = queryset.order_by('name')
     elif sort_by == 'name_desc':
-        queryset = queryset.order_by('-name')  # Z→A
+        queryset = queryset.order_by('-name')
     
     context = {
         'events': queryset,
