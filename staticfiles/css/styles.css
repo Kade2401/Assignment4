@@ -873,3 +873,7 @@ textarea:focus {
     width: 100%;
   }
 }
+
+.register-card form button[type="submit"]{
+  margin-top: 14px;
+}
