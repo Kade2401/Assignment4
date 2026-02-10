@@ -8,7 +8,9 @@ class Event(models.Model):
         related_name='events'
     )
     name = models.CharField(max_length=200)
-    date = models.DateField()
+
+    date = models.DateTimeField()
+
     capacity = models.PositiveIntegerField()
 
     location_name = models.CharField(max_length=200, blank=True)

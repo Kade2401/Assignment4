@@ -10,12 +10,26 @@ from .models import Event
 class EventForm(forms.ModelForm):
     class Meta:
         model = Event
-        fields = ['name', 'date', 'capacity', 'location_name', 'location_address', 'latitude', 'longitude']
+        fields = [
+            'name',
+            'date',
+            'capacity',
+            'location_name',
+            'location_address',
+            'latitude',
+            'longitude'
+        ]
         widgets = {
-            'date': forms.DateInput(attrs={'type': 'date'}),
+            'date': forms.DateTimeInput(
+                attrs={
+                    'type': 'datetime-local',
+                    'class': 'form-control'
+                }
+            ),
             'latitude': forms.HiddenInput(),
             'longitude': forms.HiddenInput(),
         }
+
 
 class AttendeeForm(forms.ModelForm):
     class Meta:

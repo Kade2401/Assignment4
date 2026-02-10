@@ -43,7 +43,7 @@
           <h1 class="gradient-text">{{ event.name }}</h1>
 
           <p style="color: #64748b; font-size: 18px; margin-top: 4px;">
-            <i class="fas fa-calendar-day"></i> {{ event.date }}
+            <i class="fas fa-calendar-day"></i> {{ event.date|date:"d.m.Y H:i" }}
           </p>
 
           {% if event.location_name or event.location_address %}
