@@ -28,4 +28,5 @@ urlpatterns = [
     path('events/', views.event_list, name='event_list'),
     path("events/<int:event_id>/", views.event_detail, name="event_detail"),
     path("invite/<uuid:token>/", views.invite_checkin, name="invite_checkin"),
+    path("events/<int:event_id>/join/", views.join_event, name="join_event"),
 ]

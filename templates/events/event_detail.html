@@ -225,6 +225,27 @@
       </div>
     {% endif %}
       <!-- FOOTER BUTTONS -->
+        {% if event.is_global and not event.invite_only %}
+          {% if is_joined %}
+            <div class="message success" style="margin-top:16px;">
+              ✅ You are already registered for this event
+            </div>
+          {% else %}
+            {% if not is_full %}
+              <form method="post" action="{% url 'join_event' event.id %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-primary">
+                  Join event
+                </button>
+              </form>
+            {% else %}
+              <div class="message warning" style="margin-top:16px;">
+                ⚠️ Event is full
+              </div>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
       <div style="display:flex; gap:12px; flex-wrap:wrap; margin-top:22px;">
         {% if is_owner %}
           <a href="{% url 'edit_event' event.id %}" class="btn btn-outline">

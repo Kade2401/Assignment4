@@ -41,12 +41,36 @@ class Event(models.Model):
 
 
 class Attendee(models.Model):
+    user = models.ForeignKey(
+        User,
+        null=True,
+        blank=True,
+        on_delete=models.CASCADE,
+        related_name="attendances"
+    )
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=50, blank=True)
-    event = models.ForeignKey(Event, related_name='attendees', on_delete=models.CASCADE)
+    event = models.ForeignKey(
+        Event,
+        related_name='attendees',
+        on_delete=models.CASCADE
+    )
 
     class Meta:
-        unique_together = ('name', 'event')
+        constraints = [
+            # один пользователь — один раз на ивент
+            models.UniqueConstraint(
+                fields=["event", "user"],
+                name="unique_user_per_event"
+            ),
+            # защита от дублей по имени (как у тебя было)
+            models.UniqueConstraint(
+                fields=["event", "name"],
+                name="unique_name_per_event"
+            ),
+        ]
 
     def __str__(self):
-        return f"{self.name} - {self.role} ({self.event.name})"
+        if self.user:
+            return f"{self.user.username} ({self.role}) — {self.event.name}"
+        return f"{self.name} ({self.role}) — {self.event.name}"

@@ -92,6 +92,8 @@ def event_detail(request, event_id):
     is_owner = (event.owner == request.user)
     is_invited = event.invited_users.filter(id=request.user.id).exists()
     is_public_global = (event.is_global and not event.invite_only)
+    is_joined = event.attendees.filter(user=request.user).exists()
+
 
     can_view = is_owner or is_invited or is_public_global
     if not can_view:
@@ -118,6 +120,7 @@ def event_detail(request, event_id):
         "can_see_invite": can_see_invite,
         "is_owner": is_owner,
         "is_invited": is_invited,
+        "is_joined": is_joined,
     })
 
 @login_required
@@ -397,3 +400,23 @@ def invite_checkin(request, token):
     return render(request, "events/invite_checkin.html", {
         "event": event
     })
+
+@login_required
+def join_event(request, event_id):
+    event = get_object_or_404(Event, id=event_id, is_global=True, invite_only=False)
+
+    if request.method != "POST":
+        return redirect("event_detail", event_id=event.id)
+
+    if event.is_full():
+        messages.error(request, "Event is full!")
+        return redirect("event_detail", event_id=event.id)
+
+    Attendee.objects.get_or_create(
+        event=event,
+        user=request.user,
+        defaults={"name": request.user.username, "role": "guest"}
+    )
+
+    messages.success(request, "You are registered for this global event!")
+    return redirect("event_detail", event_id=event.id)
