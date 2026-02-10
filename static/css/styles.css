@@ -884,6 +884,7 @@ input[type="radio"]:checked {
 }
 
 .filters-container {
+      background: rgba(245, 247, 250, 0.6);
       border-radius: 10px;
       padding: 15px;
       margin: 15px 0;
@@ -894,6 +895,7 @@ input[type="radio"]:checked {
       justify-content: space-between;
       align-items: center;
       margin-bottom: 12px;
+      padding-bottom: 10px;
     }
     
     .filter-toggle-btn {
@@ -936,9 +938,9 @@ input[type="radio"]:checked {
     .filter-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 12px;
-      align-items: center;
+      gap: 15px;
+      margin-bottom: 15px;
+      align-items: flex-end;
     }
     
     .filter-group {
@@ -970,7 +972,7 @@ input[type="radio"]:checked {
     
     .radio-group {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
     }
     
@@ -978,7 +980,7 @@ input[type="radio"]:checked {
       display: flex;
       align-items: center;
       gap: 6px;
-      padding: 6px 12px;
+      padding: 8px 14px;
       border-radius: 6px;
       background: #f8f9fa;
       font-size: 13px;
@@ -1051,6 +1053,16 @@ input[type="radio"]:checked {
       color: #2c3e50;
     }
     
+    .active-filters .filter-tag {
+      display: inline-block;
+      background: white;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin: 2px;
+      border: 1px solid #4361ee;
+      font-weight: 500;
+    }
+    
     .sort-options {
       display: flex;
       gap: 8px;
@@ -1064,5 +1076,12 @@ input[type="radio"]:checked {
       font-weight: 600;
       color: #2c3e50;
       margin-right: 10px;
+      font-size: 14px;
+    }
+    
+    .filter-title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 8px;
       font-size: 14px;
     }

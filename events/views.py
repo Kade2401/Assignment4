@@ -19,28 +19,24 @@ from django.views.generic import ListView
 def event_list(request):
     queryset = Event.objects.all()
     
-    # Определяем режим фильтрации
-    filter_mode = request.GET.get('filter_mode', 'date')
-    
     # === Фильтрация по датам ===
-    if filter_mode == 'date':
-        date_from = request.GET.get('date_from')
-        date_to = request.GET.get('date_to')
-        
-        if date_from:
-            queryset = queryset.filter(date__gte=date_from)
-        if date_to:
-            from datetime import datetime, time
-            date_to_datetime = datetime.combine(
-                datetime.fromisoformat(date_to).date(),
-                time(23, 59, 59)
-            )
-            queryset = queryset.filter(date__lte=date_to_datetime)
+    date_from = request.GET.get('date_from')
+    date_to = request.GET.get('date_to')
+    
+    if date_from:
+        queryset = queryset.filter(date__gte=date_from)
+    if date_to:
+        from datetime import datetime, time
+        date_to_datetime = datetime.combine(
+            datetime.fromisoformat(date_to).date(),
+            time(23, 59, 59)
+        )
+        queryset = queryset.filter(date__lte=date_to_datetime)
     
     # === Фильтрация по участникам ===
-    elif filter_mode == 'attendees':
-        availability = request.GET.get('availability', 'all')
-        
+    availability = request.GET.get('availability', 'all')
+    
+    if availability != 'all':
         from django.db.models import Count, F
         queryset = queryset.annotate(
             attendees_count=Count('attendees')
@@ -65,7 +61,9 @@ def event_list(request):
     
     context = {
         'events': queryset,
-        'filter_mode': filter_mode,
+        'date_from': date_from,
+        'date_to': date_to,
+        'availability': availability,
         'sort_by': sort_by,
     }
     return render(request, 'events/event_list.html', context)
